@@ -15,17 +15,36 @@ body {
   touch-action: none;
 }
 
-/* Forzar orientación horizontal en móvil */
-@media (max-width: 768px) and (orientation: portrait) {
-  html, body {
-    width: 100vh;
-    height: 100vw;
-    overflow-x: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
-    transform: rotate(90deg);
-    transform-origin: top left;
+/* Mejorar orientación horizontal en móvil */
+@media (max-width: 768px) {
+  /* En portrait, forzar landscape */
+  @media (orientation: portrait) {
+    html, body {
+      width: 100vh;
+      height: 100vw;
+      overflow-x: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: rotate(90deg);
+      transform-origin: top left;
+    }
+  }
+  
+  /* En landscape, optimizar para el juego */
+  @media (orientation: landscape) {
+    body {
+      overflow: hidden;
+    }
+    
+    .game-container {
+      padding: 5px !important;
+    }
+    
+    .game-wrapper {
+      max-width: min(95vh, 95vw) !important;
+      max-height: min(95vh, 95vw) !important;
+    }
   }
 }
 
@@ -44,15 +63,16 @@ body {
   max-width: 650px;
   max-height: 650px;
   aspect-ratio: 1 / 1;
-  background: black;
+  background-image: url(../public/assets/mapas/starfall.gif);
   overflow: hidden;
   border: 2px solid #333;
+  box-shadow: 0 0 20px rgba(0, 150, 255, 0.3);
 }
 
 .nes-screen {
   width: 100%;
   height: 100%;
-  background: black;
+  background-image: url(../public/assets/mapas/starfall.gif);
   color: white;
   display: flex;
   flex-direction: column;
@@ -67,9 +87,10 @@ body {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+  will-change: transform;
 }
 
-/* Texto estilo NES */
+/* Texto estilo NES mejorado */
 .nes-screen div, .nes-screen p, .nes-screen h1, .nes-screen h2, .nes-screen h3, .nes-screen h4, .nes-screen h5 {
   font-family: "Pixelify Sans", monospace;
   font-size: 16px;
@@ -79,43 +100,168 @@ body {
   text-transform: uppercase;
   letter-spacing: 1px;
   cursor: pointer;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
 }
 
-.nes-screen h1 { font-size: 32px; }
-.nes-screen h2 { font-size: 24px; }
-.nes-screen h3 { font-size: 20px; }
-.nes-screen h4 { font-size: 18px; }
+.nes-screen h1 { 
+  font-size: 32px; 
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.8);
+}
+.nes-screen h2 { 
+  font-size: 24px; 
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+}
+.nes-screen h3 { 
+  font-size: 20px; 
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+}
+.nes-screen h4 { 
+  font-size: 18px; 
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+}
 
 /* Input estilo NES */
-.form-control {
+.form-control, input[type="text"] {
   background: black;
   color: white;
-  border: 1px solid white;
+  border: 2px solid white;
   font-family: "Pixelify Sans", monospace;
   text-transform: uppercase;
   text-align: center;
+  outline: none;
+  transition: all 0.2s ease;
 }
 
-.form-control:focus {
+.form-control:focus, input[type="text"]:focus {
   background: #111;
   color: white;
-  border-color: yellow;
-  outline: none;
+  border-color: #ffff00;
+  box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+/* Botones estilo NES mejorados */
+button, div[style*="cursor: pointer"] {
+  transition: all 0.15s ease !important;
+  user-select: none;
+}
+
+button:hover, div[style*="cursor: pointer"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+button:active, div[style*="cursor: pointer"]:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Efectos de partículas para mejorar el rendimiento */
+.sprite, .position-absolute {
+  will-change: transform;
+}
+
+/* Animación de parpadeo optimizada */
+@keyframes parpadeo {
+  0% { opacity: 1; }
+  25% { opacity: 0.3; }
+  50% { opacity: 1; }
+  75% { opacity: 0.3; }
+  100% { opacity: 0.3; }
 }
 
 /* Scroll suave si es necesario */
 .nes-screen {
   -ms-overflow-style: none;
   scrollbar-width: none;
+  scrollbar-width: thin;
 }
 .nes-screen::-webkit-scrollbar {
+  width: 4px;
+}
+.nes-screen::-webkit-scrollbar-track {
+  background: transparent;
+}
+.nes-screen::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+/* Responsive mejorado */
+@media (max-width: 650px) {
+  .game-wrapper {
+    width: 95vmin;
+    height: 95vmin;
+    border: 1px solid #333;
+  }
+  
+  .nes-screen h1 { font-size: 28px; }
+  .nes-screen h2 { font-size: 22px; }
+  .nes-screen h3 { font-size: 18px; }
+  .nes-screen h4 { font-size: 16px; }
+  .nes-screen div, .nes-screen p { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+  .game-container {
+    padding: 5px;
+  }
+  
+  .game-wrapper {
+    width: 98vmin;
+    height: 98vmin;
+  }
+  
+  .nes-screen h1 { font-size: 24px; }
+  .nes-screen h2 { font-size: 20px; }
+  .nes-screen h3 { font-size: 16px; }
+  .nes-screen h4 { font-size: 14px; }
+  .nes-screen div, .nes-screen p { font-size: 12px; }
+}
+
+/* Optimizaciones de rendimiento */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reducir repaints en elementos que se mueven frecuentemente */
+.sprite, .position-absolute[style*="left"], .position-absolute[style*="top"] {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Mejorar rendimiento de animaciones */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Ocultar scrollbars en elementos del juego */
+.nes-screen *::-webkit-scrollbar {
   display: none;
 }
 
-/* Responsive */
-@media (max-width: 650px) {
-  .game-wrapper {
-    width: 95vw;
-    height: 95vw;
+/* Mejorar legibilidad en pantallas pequeñas */
+@media (max-height: 500px) {
+  .nes-screen {
+    font-size: 12px;
+  }
+  
+  .nes-screen h1 { font-size: 20px; }
+  .nes-screen h2 { font-size: 18px; }
+  .nes-screen h3 { font-size: 16px; }
+  .nes-screen h4 { font-size: 14px; }
+}
+
+/* Optimización para dispositivos de alta densidad */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sprite {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
   }
 }
