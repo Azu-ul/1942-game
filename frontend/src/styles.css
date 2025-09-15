@@ -1,30 +1,121 @@
 * {
-  font-family: "Pixelify Sans", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Pixelify Sans", monospace;
   font-optical-sizing: auto;
   font-weight: 500;
   font-style: normal;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
+  background: black;
   overflow: hidden;
-}
-.game-area {
-overflow: hidden;
+  touch-action: none;
 }
 
-.enemy-bullet {
-  width: 20px !important;
-  height: 20px !important;
+/* Forzar orientación horizontal en móvil */
+@media (max-width: 768px) and (orientation: portrait) {
+  html, body {
+    width: 100vh;
+    height: 100vw;
+    overflow-x: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: rotate(90deg);
+    transform-origin: top left;
+  }
 }
 
-.player-bullet {
-  width: 8px !important;
-  height: 16px !important;
+.game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: black;
+  padding: 10px;
+}
+
+.game-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 650px;
+  max-height: 650px;
+  aspect-ratio: 1 / 1;
+  background: black;
+  overflow: hidden;
+  border: 2px solid #333;
+}
+
+.nes-screen {
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
 }
 
 .sprite {
-position: absolute;
-width: 64px;
-height: 64px;
-image-rendering: pixelated;
+  position: absolute;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Texto estilo NES */
+.nes-screen div, .nes-screen p, .nes-screen h1, .nes-screen h2, .nes-screen h3, .nes-screen h4, .nes-screen h5 {
+  font-family: "Pixelify Sans", monospace;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.nes-screen h1 { font-size: 32px; }
+.nes-screen h2 { font-size: 24px; }
+.nes-screen h3 { font-size: 20px; }
+.nes-screen h4 { font-size: 18px; }
+
+/* Input estilo NES */
+.form-control {
+  background: black;
+  color: white;
+  border: 1px solid white;
+  font-family: "Pixelify Sans", monospace;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.form-control:focus {
+  background: #111;
+  color: white;
+  border-color: yellow;
+  outline: none;
+}
+
+/* Scroll suave si es necesario */
+.nes-screen {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.nes-screen::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 650px) {
+  .game-wrapper {
+    width: 95vw;
+    height: 95vw;
+  }
 }
