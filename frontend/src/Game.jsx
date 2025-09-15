@@ -83,8 +83,8 @@ function Enemy({ enemy }) {
 }
 
 // Constantes del juego
-const GAME_W = 480
-const GAME_H = 700
+const GAME_W = 650
+const GAME_H = 650
 const PLAYER_SPEED = 300
 const BULLET_SPEED = 1000
 const ENEMY_BULLET_SPEED = 400
@@ -96,7 +96,7 @@ const MAX_BURST_COUNT = 5
 const ENEMY_SPEED = 120
 const GREEN_ENEMY_SPEED = 300
 const SLOW_DURATION = 1
-const BG_IMAGE_HEIGHT = 3000
+const BG_IMAGE_HEIGHT = 2164
 
 // Configuración de la API
 const API_BASE_URL = 'http://localhost:4000'
