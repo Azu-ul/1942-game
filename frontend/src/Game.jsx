@@ -560,11 +560,18 @@ function GameOverScreen({ score, onRestart, onMainMenu, onSaveScore, rank }) {
   }
 
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center text-white"
-      style={{ width: GAME_W, height: GAME_H, background: 'linear-gradient(45deg, #220011, #660033)' }}>
+    <div
+      className="d-flex flex-column align-items-center justify-content-center text-white"
+      style={{
+        width: GAME_W,
+        height: GAME_H,
+        background: 'linear-gradient(45deg, #220011, #660033)',
+      }}
+    >
       <h1 className="display-3 text-danger mb-4">GAME OVER</h1>
       <h2 className="text-warning mb-4">Score Final: {score}</h2>
 
+      {/* Mostrar input de iniciales si entra en el ranking y todavía no guardó */}
       {rank && rank <= 10 && !scoreSaved && (
         <div className="text-center mb-4">
           <h4 className="text-success">¡Nuevo High Score!</h4>
@@ -592,8 +599,14 @@ function GameOverScreen({ score, onRestart, onMainMenu, onSaveScore, rank }) {
         </div>
       )}
 
-      {rank && rank <= 10 && !scoreSaved && (
-        <div className="text-center">
+      {/* Mostrar botones SOLO después de guardar o si no es high score */}
+      {(scoreSaved || !rank || rank > 10) && (
+        <div className="text-center mt-4">
+          {scoreSaved && (
+            <div className="mb-2">
+              <h5 className="text-info">¡Score guardado con éxito, {initials}!</h5>
+            </div>
+          )}
           <button className="btn btn-success btn-lg mb-3" onClick={onRestart}>
             JUGAR DE NUEVO
           </button>
@@ -603,9 +616,11 @@ function GameOverScreen({ score, onRestart, onMainMenu, onSaveScore, rank }) {
           </button>
         </div>
       )}
+
     </div>
   )
 }
+
 
 // Pantalla de Ranking
 function RankingScreen({ onBack, scores, isLoading, error }) {
