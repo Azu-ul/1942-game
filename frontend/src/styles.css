@@ -1,0 +1,23 @@
+body {
+  overflow: hidden;
+}
+.game-area {
+overflow: hidden;
+}
+
+.enemy-bullet {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.player-bullet {
+  width: 8px !important;
+  height: 16px !important;
+}
+
+.sprite {
+position: absolute;
+width: 64px;
+height: 64px;
+image-rendering: pixelated;
+}
