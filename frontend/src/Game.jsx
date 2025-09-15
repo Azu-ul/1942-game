@@ -98,6 +98,9 @@ const GREEN_ENEMY_SPEED = 300
 const SLOW_DURATION = 1
 const BG_IMAGE_HEIGHT = 3000
 
+// Configuración de la API
+const API_BASE_URL = 'http://localhost:4000'
+
 // Componente principal del juego
 function GameEngine({ onGameOver, onPause, score, setScore, lives, setLives }) {
   const keys = useKeyboard()
@@ -461,10 +464,10 @@ function GameEngine({ onGameOver, onPause, score, setScore, lives, setLives }) {
 // Pantalla de inicio
 function StartScreen({ onStart, onShowRanking }) {
   const [showInstructions, setShowInstructions] = useState(false)
-  
+
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center text-white" 
-         style={{ width: GAME_W, height: GAME_H, background: 'linear-gradient(45deg, #001122, #003366)' }}>
+    <div className="d-flex flex-column align-items-center justify-content-center text-white"
+      style={{ width: GAME_W, height: GAME_H, background: 'linear-gradient(45deg, #001122, #003366)' }}>
       <h1 className="display-2 mb-4 text-warning">1942</h1>
       <div className="text-center mb-4">
         <div className="mb-3">
@@ -472,7 +475,7 @@ function StartScreen({ onStart, onShowRanking }) {
           <small>Tu Avión</small>
         </div>
       </div>
-      
+
       {!showInstructions ? (
         <div className="text-center">
           <button className="btn btn-success btn-lg mb-3 px-5" onClick={onStart}>
@@ -519,8 +522,8 @@ function StartScreen({ onStart, onShowRanking }) {
 // Pantalla de pausa
 function PauseScreen({ onResume, onQuit, score, lives }) {
   return (
-    <div className="position-absolute top-0 start-0 d-flex flex-column align-items-center justify-content-center text-white bg-dark bg-opacity-90" 
-         style={{ width: GAME_W, height: GAME_H, zIndex: 1000 }}>
+    <div className="position-absolute top-0 start-0 d-flex flex-column align-items-center justify-content-center text-white bg-dark bg-opacity-90"
+      style={{ width: GAME_W, height: GAME_H, zIndex: 1000 }}>
       <h2 className="text-warning mb-4">PAUSA</h2>
       <div className="text-center mb-4">
         <p>Score: {score}</p>
@@ -537,50 +540,59 @@ function PauseScreen({ onResume, onQuit, score, lives }) {
 }
 
 // Pantalla de Game Over
-function GameOverScreen({ score, onRestart, onMainMenu, onSaveScore, isHighScore }) {
+function GameOverScreen({ score, onRestart, onMainMenu, onSaveScore, rank }) {
   const [initials, setInitials] = useState('')
   const [scoreSaved, setScoreSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  const handleSaveScore = () => {
+  const handleSaveScore = async () => {
     if (initials.length === 3) {
-      onSaveScore(initials, score)
-      setScoreSaved(true)
+      setSaving(true)
+      try {
+        await onSaveScore(initials, score)
+        setScoreSaved(true)
+      } catch (error) {
+        console.error('Error saving score:', error)
+      } finally {
+        setSaving(false)
+      }
     }
   }
 
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center text-white" 
-         style={{ width: GAME_W, height: GAME_H, background: 'linear-gradient(45deg, #220011, #660033)' }}>
+    <div className="d-flex flex-column align-items-center justify-content-center text-white"
+      style={{ width: GAME_W, height: GAME_H, background: 'linear-gradient(45deg, #220011, #660033)' }}>
       <h1 className="display-3 text-danger mb-4">GAME OVER</h1>
       <h2 className="text-warning mb-4">Score Final: {score}</h2>
-      
-      {isHighScore && !scoreSaved && (
+
+      {rank && rank <= 10 && !scoreSaved && (
         <div className="text-center mb-4">
           <h4 className="text-success">¡Nuevo High Score!</h4>
           <p>Ingresa tus iniciales:</p>
           <div className="d-flex align-items-center gap-2 mb-3">
-            <input 
-              type="text" 
-              className="form-control text-center" 
+            <input
+              type="text"
+              className="form-control text-center"
               style={{ width: '80px', textTransform: 'uppercase' }}
               maxLength={3}
               value={initials}
               onChange={(e) => setInitials(e.target.value.toUpperCase())}
-              onKeyDown={(e) => e.key === 'Enter' && handleSaveScore()}
+              onKeyDown={(e) => e.key === 'Enter' && !saving && handleSaveScore()}
               autoFocus
+              disabled={saving}
             />
-            <button 
+            <button
               className="btn btn-primary"
               onClick={handleSaveScore}
-              disabled={initials.length !== 3}
+              disabled={initials.length !== 3 || saving}
             >
-              Guardar
+              {saving ? 'Guardando...' : 'Guardar'}
             </button>
           </div>
         </div>
       )}
-      
-      {(scoreSaved || !isHighScore) && (
+
+      {rank && rank <= 10 && !scoreSaved && (
         <div className="text-center">
           <button className="btn btn-success btn-lg mb-3" onClick={onRestart}>
             JUGAR DE NUEVO
@@ -596,20 +608,30 @@ function GameOverScreen({ score, onRestart, onMainMenu, onSaveScore, isHighScore
 }
 
 // Pantalla de Ranking
-function RankingScreen({ onBack, scores, isLoading }) {
+function RankingScreen({ onBack, scores, isLoading, error }) {
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center text-white p-4" 
-         style={{ width: GAME_W, height: GAME_H, background: 'linear-gradient(45deg, #001122, #003366)' }}>
+    <div className="d-flex flex-column align-items-center justify-content-center text-white p-4"
+      style={{ width: GAME_W, height: GAME_H, background: 'linear-gradient(45deg, #001122, #003366)' }}>
       <h1 className="text-warning mb-4">RANKING</h1>
-      
+
       {isLoading ? (
-        <p>Cargando rankings...</p>
+        <div className="text-center">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+          <p>Cargando rankings...</p>
+        </div>
+      ) : error ? (
+        <div className="text-center text-danger mb-4">
+          <p>Error al cargar los rankings:</p>
+          <p>{error}</p>
+        </div>
       ) : (
         <div className="w-100">
           {scores.length > 0 ? (
             <div className="bg-dark bg-opacity-75 p-3 rounded">
               {scores.map((score, index) => (
-                <div key={index} className="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                <div key={score.id} className="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
                   <span className="text-warning fw-bold">#{index + 1}</span>
                   <span className="text-info fw-bold">{score.initials}</span>
                   <span className="text-success fw-bold">{score.score.toLocaleString()}</span>
@@ -621,12 +643,51 @@ function RankingScreen({ onBack, scores, isLoading }) {
           )}
         </div>
       )}
-      
+
       <button className="btn btn-secondary mt-4" onClick={onBack}>
         VOLVER
       </button>
     </div>
   )
+}
+
+// Funciones para la API
+const scoresAPI = {
+  async getAll() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/scores`)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error fetching scores:', error)
+      throw error
+    }
+  },
+
+  async create(initials, score) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/scores`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ initials, score }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error saving score:', error)
+      throw error
+    }
+  }
 }
 
 // Componente principal del juego completo
@@ -636,40 +697,43 @@ export default function Complete1942Game() {
   const [lives, setLives] = useState(3)
   const [highScores, setHighScores] = useState([])
   const [isLoadingScores, setIsLoadingScores] = useState(false)
+  const [scoresError, setScoresError] = useState(null)
 
-  // Simular API calls para el ranking (reemplaza con llamadas reales)
+  // Cargar scores desde la base de datos
   const loadHighScores = async () => {
     setIsLoadingScores(true)
+    setScoresError(null)
     try {
-      // Simular datos del servidor
-      const mockScores = [
-        { initials: 'ACE', score: 15000 },
-        { initials: 'TOP', score: 12000 },
-        { initials: 'PRO', score: 10000 },
-        { initials: 'WIN', score: 8500 },
-        { initials: 'GOD', score: 7200 },
-      ]
-      setTimeout(() => {
-        setHighScores(mockScores)
-        setIsLoadingScores(false)
-      }, 500)
+      const scores = await scoresAPI.getAll()
+      setHighScores(scores)
     } catch (error) {
       console.error('Error loading scores:', error)
+      setScoresError(error.message)
+      // Fallback a datos vacíos en caso de error
+      setHighScores([])
+    } finally {
       setIsLoadingScores(false)
     }
   }
 
+  // Guardar score en la base de datos
   const saveScore = async (initials, playerScore) => {
     try {
-      // Simular guardado en servidor
-      const newScore = { initials, score: playerScore }
-      const updatedScores = [...highScores, newScore]
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 10)
-      setHighScores(updatedScores)
-      console.log(`Score saved: ${initials} - ${playerScore}`)
+      const result = await scoresAPI.create(initials, playerScore)
+      // Recargar los scores después de guardar
+      await loadHighScores()
+
+      // Mostrar mensaje apropiado según la respuesta del servidor
+      if (result.updated) {
+        console.log(`Score actualizado para ${initials}: ${playerScore}`)
+      } else if (result.inserted) {
+        console.log(`Nuevo score guardado para ${initials}: ${playerScore}`)
+      } else if (result.kept_existing) {
+        console.log(`Score existente para ${initials} era mejor`)
+      }
     } catch (error) {
       console.error('Error saving score:', error)
+      throw error
     }
   }
 
@@ -688,9 +752,28 @@ export default function Complete1942Game() {
     setGameState('ranking')
   }
 
+  // Verificar si el score actual es un high score
   const isHighScore = () => {
-    return highScores.length < 10 || score > highScores[highScores.length - 1]?.score
+    // Si hay menos de 10 scores, siempre es high score
+    if (highScores.length < 10) return true
+
+    // Verificar si el score es mayor que el último del top 10
+    const worstScore = highScores[highScores.length - 1]?.score || 0
+    if (score > worstScore) return true
+
+    // Verificar si ya existe un record con mejores iniciales y este score es mejor
+    // Esto se manejará mejor en el servidor, pero por ahora mantenemos la lógica simple
+    return false
   }
+
+  const getScoreRank = () => {
+    const tempScores = [...highScores, { initials: 'YOU', score }]
+      .sort((a, b) => b.score - a.score)   // ordenar de mayor a menor
+      .slice(0, 10)                        // quedarse con top 10
+    const index = tempScores.findIndex(s => s.score === score)
+    return index === -1 ? null : index + 1 // devuelve 1..10 si estás en top 10, o null si no
+  }
+
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-dark">
@@ -698,9 +781,9 @@ export default function Complete1942Game() {
         {gameState === 'start' && (
           <StartScreen onStart={startGame} onShowRanking={showRanking} />
         )}
-        
+
         {gameState === 'playing' && (
-          <GameEngine 
+          <GameEngine
             onGameOver={gameOver}
             onPause={pauseGame}
             score={score}
@@ -712,7 +795,7 @@ export default function Complete1942Game() {
 
         {gameState === 'paused' && (
           <div>
-            <GameEngine 
+            <GameEngine
               onGameOver={gameOver}
               onPause={pauseGame}
               score={score}
@@ -720,7 +803,7 @@ export default function Complete1942Game() {
               lives={lives}
               setLives={setLives}
             />
-            <PauseScreen 
+            <PauseScreen
               onResume={resumeGame}
               onQuit={quitToMainMenu}
               score={score}
@@ -730,20 +813,22 @@ export default function Complete1942Game() {
         )}
 
         {gameState === 'gameOver' && (
-          <GameOverScreen 
+          <GameOverScreen
             score={score}
             onRestart={startGame}
             onMainMenu={quitToMainMenu}
             onSaveScore={saveScore}
-            isHighScore={isHighScore()}
+            rank={getScoreRank()}
           />
         )}
 
+
         {gameState === 'ranking' && (
-          <RankingScreen 
+          <RankingScreen
             onBack={quitToMainMenu}
             scores={highScores}
             isLoading={isLoadingScores}
+            error={scoresError}
           />
         )}
       </div>
