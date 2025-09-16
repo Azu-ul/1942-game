@@ -57,16 +57,16 @@ const VidasDisplay = React.memo(({ vidas, vidasPerdidas }) => {
 // Componente HUD optimizado estilo NES
 const HUDDisplay = React.memo(({ puntuacion, puntajeMaximo }) => {
   return (
-    <div className="position-absolute top-0 w-100 d-flex justify-content-between align-items-center p-2" 
-         style={{ fontSize: '14px', color: 'white', zIndex: 20 }}>
+    <div className="position-absolute top-0 w-100 d-flex justify-content-between align-items-center p-2"
+      style={{ fontSize: '14px', color: 'white', zIndex: 20 }}>
       <div>1UP</div>
       <div style={{ marginLeft: '10px' }}>{puntuacion.toLocaleString().padStart(8, '0')}</div>
-      
+
       <div style={{ textAlign: 'center', flex: 1 }}>
         <div>HIGH SCORE</div>
         <div>{puntajeMaximo.toLocaleString().padStart(8, '0')}</div>
       </div>
-      
+
       <div>2UP</div>
       <div style={{ marginLeft: '10px' }}>00000000</div>
     </div>
@@ -74,16 +74,16 @@ const HUDDisplay = React.memo(({ puntuacion, puntajeMaximo }) => {
 })
 
 function MotorJuego() {
-  const { 
-    puntuacion, 
-    setPuntuacion, 
-    vidas, 
-    setVidas, 
-    pausarJuego, 
+  const {
+    puntuacion,
+    setPuntuacion,
+    vidas,
+    setVidas,
+    pausarJuego,
     finalizarJuego,
-    puntajesAltos 
+    puntajesAltos
   } = useContextoJuego()
-  
+
   const teclas = useTeclado()
 
   // Estados del juego usando refs para evitar re-renders
@@ -114,11 +114,11 @@ function MotorJuego() {
   const [movimientoTactil, setMovimientoTactil] = useState({ x: 0, y: 0, active: false })
   const [disparoTactil, setDisparoTactil] = useState(false)
 
-  const esMobile = useMemo(() => 
+  const esMobile = useMemo(() =>
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent), []
   )
 
-  const puntajeMaximo = useMemo(() => 
+  const puntajeMaximo = useMemo(() =>
     puntajesAltos.length > 0 ? puntajesAltos[0].score : 0, [puntajesAltos]
   )
 
@@ -126,7 +126,7 @@ function MotorJuego() {
   const actualizarEstadoVisual = useCallback(() => {
     const gs = estadoJuegoRef.current
     gs.frameCounter++
-    
+
     // Solo actualizar cada 2 frames
     if (gs.frameCounter % 2 === 0) {
       setEstadoVisual({
@@ -143,9 +143,9 @@ function MotorJuego() {
   const manejarPerdidaVida = useCallback(() => {
     const vidasActuales = estadoJuegoRef.current.vidas || vidas
     const nuevaVidaPerdida = 3 - vidasActuales
-    
+
     setVidasPerdidas(prev => [...prev, nuevaVidaPerdida])
-    
+
     // Quitar el parpadeo después de la animación
     setTimeout(() => {
       setVidasPerdidas(prev => prev.filter(v => v !== nuevaVidaPerdida))
@@ -296,10 +296,24 @@ function MotorJuego() {
               nx = e.centerX + Math.cos(e.angle) * e.radius
               ny = e.centerY + Math.sin(e.angle) * e.radius
 
+              // >>> CALCULAR ROTACIÓN BASADA EN LA DIRECCIÓN DEL MOVIMIENTO <<<
+              // Velocidad instantánea en X e Y
+              const dx = nx - e.xPrev; // cambio en X desde el último frame
+              const dy = ny - e.yPrev; // cambio en Y desde el último frame
+
+              // Si hay movimiento, calcular el ángulo
+              if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
+                e.rotation = Math.atan2(dy, dx); // atan2(dy, dx) da el ángulo en radianes
+              }
+
+              // Guardar posición actual como previa para el próximo frame
+              e.xPrev = nx;
+              e.yPrev = ny;
+
               if (e.angle >= 2 * Math.PI) {
-                e.angle -= 2 * Math.PI
-                e.circleCount += 1
-                if (e.circleCount >= 2) state = 'exit'
+                e.angle -= 2 * Math.PI;
+                e.circleCount += 1;
+                if (e.circleCount >= 2) state = 'exit';
               }
 
               if (fireCooldown <= 0) {
@@ -321,6 +335,13 @@ function MotorJuego() {
             } else if (state === 'exit') {
               const dir = e.centerX < ANCHO_JUEGO / 2 ? -1 : 1
               nx += dir * e.speed * dt
+
+              // >>> ROTACIÓN EN MOVIMIENTO LINEAL <<<
+              const targetAngle = Math.atan2(dy, dx);
+              const diff = targetAngle - e.rotation;
+              // Normalizar diferencia de ángulo
+              const normalizedDiff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI;
+              e.rotation += normalizedDiff * 0.2; // 20% de la diferencia por frame
 
               if (nx < -32 || nx > ANCHO_JUEGO) {
                 gs.enemigos.splice(i, 1)
@@ -381,7 +402,7 @@ function MotorJuego() {
           const b = gs.balasEnemigos[i]
           b.x += b.vx * dt
           b.y += b.vy * dt
-          
+
           if (b.x < 0 || b.x > ANCHO_JUEGO || b.y < 0 || b.y > ALTO_JUEGO) {
             gs.balasEnemigos.splice(i, 1)
           }
@@ -458,10 +479,10 @@ function MotorJuego() {
 
 
   return (
-    <div className="nes-screen" style={{ 
-      width: ANCHO_JUEGO, 
-      height: ALTO_JUEGO, 
-      overflow: 'hidden', 
+    <div className="nes-screen" style={{
+      width: ANCHO_JUEGO,
+      height: ALTO_JUEGO,
+      overflow: 'hidden',
       position: 'relative'
     }}>
 
@@ -473,15 +494,15 @@ function MotorJuego() {
 
       {/* ELEMENTOS DEL JUEGO */}
       <Jugador jugador={estadoVisual.jugador} />
-      
+
       {estadoVisual.balas.map((b, i) => (
         <Balas key={`bala-${i}`} bala={b} />
       ))}
-      
+
       {estadoVisual.balasEnemigos.map((b, i) => (
         <Balas key={`bala-enemigo-${i}`} bala={b} />
       ))}
-      
+
       {estadoVisual.enemigos.map((en, i) => (
         <Enemigo key={`enemigo-${i}`} enemigo={en} />
       ))}
