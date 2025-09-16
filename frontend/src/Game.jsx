@@ -25,7 +25,10 @@ function JuegoCompleto1942() {
     setPuntajesParejas,
     setCargandoPuntajes, 
     setErrorPuntajes,
-    setJugadorActual
+    mostrarCambioTurno, // ✅ Usar del contexto
+    setMostrarCambioTurno, // ✅ Usar del contexto
+    jugadorAnterior, // ✅ Usar del contexto
+    setJugadorAnterior // ✅ Usar del contexto
   } = useContextoJuego()
 
   // Manejo global del botón de pausa con ESC
@@ -40,6 +43,31 @@ function JuegoCompleto1942() {
     window.addEventListener('keydown', manejarTeclado)
     return () => window.removeEventListener('keydown', manejarTeclado)
   }, [])
+
+  // ✅ Detectar cambio de turno por muerte del jugador - SIMPLIFICADO
+  useEffect(() => {
+    if (modoJuego === '2P' && estadoJuego === 'playing') {
+      if (jugadorActual !== jugadorAnterior) {
+        // ✅ SOLO mostrar si es un cambio real (no al iniciar juego)
+        const esInicioJuego = jugadorAnterior === 1 && jugadorActual === 1
+        
+        if (!esInicioJuego) {
+          setMostrarCambioTurno(true)
+          
+          // Ocultar pantalla de cambio después de 3 segundos
+          const timer = setTimeout(() => {
+            setMostrarCambioTurno(false)
+          }, 3000)
+          
+          // Cleanup del timer
+          return () => clearTimeout(timer)
+        }
+        
+        // Actualizar jugador anterior en cualquier caso
+        setJugadorAnterior(jugadorActual)
+      }
+    }
+  }, [jugadorActual, jugadorAnterior, modoJuego, estadoJuego, setMostrarCambioTurno, setJugadorAnterior])
 
   // Cargar puntajes individuales desde la base de datos
   const cargarPuntajesAltos = async () => {
@@ -129,23 +157,6 @@ function JuegoCompleto1942() {
     return (posicion >= 0 && posicion < 10) ? posicion + 1 : null
   }
 
-  // Detectar cambio de turno por muerte del jugador
-  const [jugadorAnterior, setJugadorAnterior] = React.useState(1)
-  const [mostrandoCambioTurno, setMostrandoCambioTurno] = React.useState(false)
-
-  useEffect(() => {
-    if (modoJuego === '2P' && estadoJuego === 'playing' && jugadorActual !== jugadorAnterior) {
-      // Se cambió de jugador
-      setMostrandoCambioTurno(true)
-      setJugadorAnterior(jugadorActual)
-      
-      // Ocultar pantalla de cambio después de 3 segundos
-      setTimeout(() => {
-        setMostrandoCambioTurno(false)
-      }, 3000)
-    }
-  }, [jugadorActual, jugadorAnterior, modoJuego, estadoJuego])
-
   // Cargar puntajes al inicio y cuando se muestra el ranking
   useEffect(() => {
     if (estadoJuego === 'ranking') {
@@ -167,7 +178,7 @@ function JuegoCompleto1942() {
         
         {estadoJuego === 'playing' && (
           <>
-            {mostrandoCambioTurno && modoJuego === '2P' ? (
+            {mostrarCambioTurno && modoJuego === '2P' ? (
               <PantallaCambioTurno />
             ) : (
               <MotorJuego />

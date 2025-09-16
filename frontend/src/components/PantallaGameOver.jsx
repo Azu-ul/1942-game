@@ -2,20 +2,20 @@ import React, { useState } from 'react'
 import { useContextoJuego } from '../contexts/ContextoJuego'
 import { ANCHO_JUEGO, ALTO_JUEGO } from '../constants/constantesJuego'
 
-function PantallaGameOver({ 
-  onGuardarPuntaje, 
+function PantallaGameOver({
+  onGuardarPuntaje,
   onGuardarPuntajePareja,
-  rankingJ1, 
-  rankingJ2, 
-  rankingPareja 
+  rankingJ1,
+  rankingJ2,
+  rankingPareja
 }) {
-  const { 
+  const {
     modoJuego,
-    puntuacionJ1, 
-    puntuacionJ2, 
+    puntuacionJ1,
+    puntuacionJ2,
     puntuacionTotal,
-    iniciarJuego, 
-    volverAlMenuPrincipal 
+    iniciarJuego,
+    volverAlMenuPrincipal,
   } = useContextoJuego()
 
   // Estados para formularios
@@ -23,7 +23,7 @@ function PantallaGameOver({
   const [inicialesJ2, setInicialesJ2] = useState('')
   const [puntajeGuardado, setPuntajeGuardado] = useState(false)
   const [guardando, setGuardando] = useState(false)
-  
+
   // Estados para controlar qué guardar
   const [guardandoIndividual, setGuardandoIndividual] = useState(false)
   const [guardandoPareja, setGuardandoPareja] = useState(false)
@@ -92,8 +92,8 @@ function PantallaGameOver({
 
   if (modoJuego === '1P') {
     return (
-      <div className="nes-screen" style={{ 
-        width: ANCHO_JUEGO, 
+      <div className="nes-screen" style={{
+        width: ANCHO_JUEGO,
         height: ALTO_JUEGO,
         padding: '20px',
         display: 'flex',
@@ -113,23 +113,23 @@ function PantallaGameOver({
               <p style={{ fontSize: '16px', marginBottom: '15px' }}>
                 POSICION #{rankingJ1} - INGRESA TUS INICIALES:
               </p>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '15px', 
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '15px',
                 justifyContent: 'center',
                 flexWrap: 'wrap'
               }}>
                 <input
                   type="text"
-                  style={{ 
+                  style={{
                     width: '120px',
                     height: '50px',
                     fontSize: '24px',
                     textAlign: 'center',
-                    textTransform: 'uppercase', 
-                    backgroundColor: 'black', 
-                    color: 'white', 
+                    textTransform: 'uppercase',
+                    backgroundColor: 'black',
+                    color: 'white',
                     border: '2px solid white',
                     borderRadius: '0',
                     fontFamily: '"Pixelify Sans", monospace'
@@ -143,7 +143,7 @@ function PantallaGameOver({
                   placeholder="ABC"
                 />
                 <button
-                  style={{ 
+                  style={{
                     backgroundColor: inicialesJ1.length === 3 ? 'white' : '#666',
                     color: inicialesJ1.length === 3 ? 'black' : '#ccc',
                     border: 'none',
@@ -171,12 +171,12 @@ function PantallaGameOver({
                   </h5>
                 </div>
               )}
-              
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
-                <div 
-                  onClick={iniciarJuego} 
-                  style={{ 
-                    cursor: 'pointer', 
+                <div
+                  onClick={() => iniciarJuego('1P')}
+                  style={{
+                    cursor: 'pointer',
                     fontSize: '20px',
                     padding: '10px 20px',
                     border: '2px solid white',
@@ -188,10 +188,10 @@ function PantallaGameOver({
                 >
                   [ JUGAR DE NUEVO ]
                 </div>
-                <div 
-                  onClick={volverAlMenuPrincipal} 
-                  style={{ 
-                    cursor: 'pointer', 
+                <div
+                  onClick={volverAlMenuPrincipal}
+                  style={{
+                    cursor: 'pointer',
                     fontSize: '20px',
                     padding: '10px 20px',
                     border: '2px solid white',
@@ -213,8 +213,8 @@ function PantallaGameOver({
 
   // Modo 2P
   return (
-    <div className="nes-screen" style={{ 
-      width: ANCHO_JUEGO, 
+    <div className="nes-screen" style={{
+      width: ANCHO_JUEGO,
       height: ALTO_JUEGO,
       padding: '15px',
       display: 'flex',
@@ -224,7 +224,7 @@ function PantallaGameOver({
     }}>
       <div className="text-center text-white" style={{ fontSize: '20px', width: '100%' }}>
         <h1 style={{ marginBottom: '20px', color: '#ff0000' }}>GAME OVER</h1>
-        
+
         <div style={{ marginBottom: '25px', fontSize: '18px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
             <span style={{ color: '#00ff00' }}>P1: {puntuacionJ1.toLocaleString()}</span>
@@ -241,7 +241,7 @@ function PantallaGameOver({
             <h4 style={{ color: '#ffff00', marginBottom: '15px' }}>
               ¡NUEVOS RECORDS INDIVIDUALES!
             </h4>
-            
+
             <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
               {j1EsRecord && (
                 <div style={{ textAlign: 'center' }}>
@@ -251,14 +251,14 @@ function PantallaGameOver({
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
                     <input
                       type="text"
-                      style={{ 
+                      style={{
                         width: '80px',
                         height: '35px',
                         fontSize: '16px',
                         textAlign: 'center',
-                        textTransform: 'uppercase', 
-                        backgroundColor: 'black', 
-                        color: '#00ff00', 
+                        textTransform: 'uppercase',
+                        backgroundColor: 'black',
+                        color: '#00ff00',
                         border: '2px solid #00ff00',
                         borderRadius: '0'
                       }}
@@ -269,7 +269,7 @@ function PantallaGameOver({
                       disabled={guardandoIndividual}
                     />
                     <button
-                      style={{ 
+                      style={{
                         backgroundColor: inicialesJ1.length === 3 ? '#00ff00' : '#666',
                         color: inicialesJ1.length === 3 ? 'black' : '#ccc',
                         border: 'none',
@@ -294,14 +294,14 @@ function PantallaGameOver({
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
                     <input
                       type="text"
-                      style={{ 
+                      style={{
                         width: '80px',
                         height: '35px',
                         fontSize: '16px',
                         textAlign: 'center',
-                        textTransform: 'uppercase', 
-                        backgroundColor: 'black', 
-                        color: '#ffff00', 
+                        textTransform: 'uppercase',
+                        backgroundColor: 'black',
+                        color: '#ffff00',
                         border: '2px solid #ffff00',
                         borderRadius: '0'
                       }}
@@ -312,7 +312,7 @@ function PantallaGameOver({
                       disabled={guardandoIndividual}
                     />
                     <button
-                      style={{ 
+                      style={{
                         backgroundColor: inicialesJ2.length === 3 ? '#ffff00' : '#666',
                         color: inicialesJ2.length === 3 ? 'black' : '#ccc',
                         border: 'none',
@@ -341,18 +341,18 @@ function PantallaGameOver({
             <p style={{ marginBottom: '15px' }}>
               POSICION #{rankingPareja} - INGRESA LOS NOMBRES:
             </p>
-            
+
             <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
               <input
                 type="text"
-                style={{ 
+                style={{
                   width: '80px',
                   height: '35px',
                   fontSize: '16px',
                   textAlign: 'center',
-                  textTransform: 'uppercase', 
-                  backgroundColor: 'black', 
-                  color: '#00ff00', 
+                  textTransform: 'uppercase',
+                  backgroundColor: 'black',
+                  color: '#00ff00',
                   border: '2px solid #00ff00',
                   borderRadius: '0'
                 }}
@@ -365,14 +365,14 @@ function PantallaGameOver({
               <span style={{ color: '#fff' }}>&</span>
               <input
                 type="text"
-                style={{ 
+                style={{
                   width: '80px',
                   height: '35px',
                   fontSize: '16px',
                   textAlign: 'center',
-                  textTransform: 'uppercase', 
-                  backgroundColor: 'black', 
-                  color: '#ffff00', 
+                  textTransform: 'uppercase',
+                  backgroundColor: 'black',
+                  color: '#ffff00',
                   border: '2px solid #ffff00',
                   borderRadius: '0'
                 }}
@@ -383,7 +383,7 @@ function PantallaGameOver({
                 disabled={guardandoPareja}
               />
               <button
-                style={{ 
+                style={{
                   backgroundColor: inicialesJ1.length === 3 && inicialesJ2.length === 3 ? '#ff00ff' : '#666',
                   color: inicialesJ1.length === 3 && inicialesJ2.length === 3 ? 'black' : '#ccc',
                   border: 'none',
@@ -410,12 +410,15 @@ function PantallaGameOver({
                 </h5>
               </div>
             )}
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
-              <div 
-                onClick={() => iniciarJuego('2P')} 
-                style={{ 
-                  cursor: 'pointer', 
+              <div
+                onClick={() => {
+                  // reset explícito de todo
+                  iniciarJuego('2P')
+                }}
+                style={{
+                  cursor: 'pointer',
                   fontSize: '18px',
                   padding: '10px 20px',
                   border: '2px solid white',
@@ -427,10 +430,10 @@ function PantallaGameOver({
               >
                 [ JUGAR DE NUEVO ]
               </div>
-              <div 
-                onClick={volverAlMenuPrincipal} 
-                style={{ 
-                  cursor: 'pointer', 
+              <div
+                onClick={volverAlMenuPrincipal}
+                style={{
+                  cursor: 'pointer',
                   fontSize: '18px',
                   padding: '10px 20px',
                   border: '2px solid white',
