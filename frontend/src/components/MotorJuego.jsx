@@ -85,7 +85,6 @@ function MotorJuego() {
   } = useContextoJuego()
   
   const teclas = useTeclado()
-  const gameContainerRef = useRef(null)
 
   // Estados del juego usando refs para evitar re-renders
   const estadoJuegoRef = useRef({

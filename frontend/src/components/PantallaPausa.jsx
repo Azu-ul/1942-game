@@ -1,9 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useContextoJuego } from '../contexts/ContextoJuego'
 import { ANCHO_JUEGO, ALTO_JUEGO } from '../constants/constantesJuego'
 
 function PantallaPausa() {
   const { reanudarJuego, volverAlMenuPrincipal, puntuacion, vidas } = useContextoJuego()
+
+  // Manejar tecla Escape para reanudar
+  useEffect(() => {
+    const manejarTeclado = (e) => {
+      if (e.code === 'Escape') {
+        reanudarJuego()
+      }
+    }
+    
+    window.addEventListener('keydown', manejarTeclado)
+    return () => window.removeEventListener('keydown', manejarTeclado)
+  }, [reanudarJuego])
 
   return (
     <div className="nes-screen" style={{ 
