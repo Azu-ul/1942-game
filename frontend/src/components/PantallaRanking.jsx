@@ -114,10 +114,10 @@ function PantallaRanking() {
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          padding: '8px 15px',
+                          padding: '2px 5px',
                           backgroundColor: index % 2 === 0 ? 'rgba(255,255,255,0.1)' : 'transparent',
                           color: 'white',
-                          fontSize: '18px',
+                          fontSize: '15px',
                           border: '1px solid rgba(255,255,255,0.2)'
                         }}
                       >
@@ -135,9 +135,11 @@ function PantallaRanking() {
                           {puntaje.initials}
                         </span>
                         <span style={{
-                          minWidth: '120px',
+                          minWidth: '100px',
                           textAlign: 'right',
-                          fontFamily: 'monospace'
+                          fontFamily: 'monospace',
+                          fontWeight: 'bold',
+                          color: index < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][index] : 'white'
                         }}>
                           {puntaje.score.toLocaleString().padStart(8, '0')}
                         </span>
@@ -186,10 +188,10 @@ function PantallaRanking() {
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          padding: '6px 15px',
+                          padding: '2px 5px',
                           backgroundColor: index % 2 === 0 ? 'rgba(255,255,255,0.1)' : 'transparent',
                           color: 'white',
-                          fontSize: '18px',
+                          fontSize: '15px',
                           border: '1px solid rgba(255,255,255,0.2)'
                         }}
                       >

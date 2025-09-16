@@ -5,6 +5,7 @@ import useTeclado from '../hooks/useTeclado'
 import Jugador from './Jugador'
 import Balas from './Balas'
 import Enemigo from './Enemigo'
+import PowerUp from './PowerUp'
 import JoystickVirtual from './JoystickVirtual'
 import BotonDisparoVirtual from './BotonDisparoVirtual'
 import {
@@ -23,6 +24,13 @@ import {
   DURACION_DESACELERACION,
   ALTURA_IMAGEN_FONDO
 } from '../constants/constantesJuego'
+
+// Constantes para power-ups
+const VELOCIDAD_POWERUP = 100
+const TIEMPO_VIDA_POWERUP = 10
+const MIN_SPAWN_POWERUP = 5
+const MAX_SPAWN_POWERUP = 15
+const PUNTOS_POW = 2000
 
 // Componente optimizado para mostrar vidas como avioncitos
 const VidasDisplay = React.memo(({ vidas, vidasPerdidas, jugador }) => {
@@ -153,9 +161,12 @@ function MotorJuego() {
     balas: [],
     balasEnemigos: [],
     enemigos: [],
+    powerUps: [],
+    textoFlotante: [],
     offsetFondoY: 0,
     tiempoRecargaBala: 0,
     temporizadorRafaga: MIN_INTERVALO_RAFAGA + Math.random() * (MAX_INTERVALO_RAFAGA - MIN_INTERVALO_RAFAGA),
+    temporizadorPowerUp: MIN_SPAWN_POWERUP + Math.random() * (MAX_SPAWN_POWERUP - MIN_SPAWN_POWERUP),
     frameCounter: 0
   })
 
@@ -165,6 +176,8 @@ function MotorJuego() {
     balas: [],
     balasEnemigos: [],
     enemigos: [],
+    powerUps: [],
+    textoFlotante: [],
     offsetFondoY: 0
   })
 
@@ -200,6 +213,8 @@ function MotorJuego() {
         balas: [...gs.balas],
         balasEnemigos: [...gs.balasEnemigos],
         enemigos: [...gs.enemigos],
+        powerUps: [...gs.powerUps],
+        textoFlotante: [...gs.textoFlotante],
         offsetFondoY: gs.offsetFondoY
       })
     }
@@ -283,17 +298,87 @@ function MotorJuego() {
             y: gs.jugador.y - 20,
             vx: 0,
             vy: -VELOCIDAD_BALA,
-            tipo: 'jugador' // ✅ AÑADIDO: Identifica como bala del jugador
+            tipo: 'jugador'
           })
           gs.tiempoRecargaBala = TIEMPO_RECARGA_BALA
         }
 
-        // Actualizar balas (optimizado)
+        // Actualizar balas
         for (let i = gs.balas.length - 1; i >= 0; i--) {
           const b = gs.balas[i]
           b.y += b.vy * dt
           if (b.y < -20) {
             gs.balas.splice(i, 1)
+          }
+        }
+
+        // Spawn power-ups
+        gs.temporizadorPowerUp -= dt
+        if (gs.temporizadorPowerUp <= 0) {
+          const tipoPowerUp = Math.random() < 0.6 ? 'pow' : 'salud'
+          gs.powerUps.push({
+            x: Math.random() * (ANCHO_JUEGO - 32),
+            y: -32,
+            tipo: tipoPowerUp,
+            tiempoVida: 0
+          })
+          gs.temporizadorPowerUp = MIN_SPAWN_POWERUP + Math.random() * (MAX_SPAWN_POWERUP - MIN_SPAWN_POWERUP)
+        }
+
+        // Actualizar power-ups
+        for (let i = gs.powerUps.length - 1; i >= 0; i--) {
+          const p = gs.powerUps[i]
+          p.y += VELOCIDAD_POWERUP * dt
+          p.tiempoVida += dt
+
+          // Eliminar si expira o sale de la pantalla
+          if (p.tiempoVida >= TIEMPO_VIDA_POWERUP || p.y > ALTO_JUEGO) {
+            gs.powerUps.splice(i, 1)
+            continue
+          }
+
+          // Colisión con jugador
+          const jug = gs.jugador
+          if (jug.x < p.x + 32 && jug.x + 32 > p.x && 
+              jug.y < p.y + 32 && jug.y + 32 > p.y) {
+            
+            if (p.tipo === 'pow') {
+              // Dar puntos
+              setPuntuacion(prev => prev + PUNTOS_POW)
+              gs.textoFlotante.push({
+                x: p.x + 16,
+                y: p.y,
+                tipo: 'pow',
+                opacidad: 1,
+                tiempoVida: 0
+              })
+            } else if (p.tipo === 'salud') {
+              // Restaurar vida si no está al máximo
+              const vidasActuales = jugadorActual === 1 ? vidasJ1 : vidasJ2
+              if (vidasActuales < 3) {
+                setVidas(prev => Math.min(3, prev + 1))
+                gs.textoFlotante.push({
+                  x: p.x + 16,
+                  y: p.y,
+                  tipo: 'salud',
+                  opacidad: 1,
+                  tiempoVida: 0
+                })
+              }
+            }
+            
+            gs.powerUps.splice(i, 1)
+          }
+        }
+
+        // Actualizar texto flotante
+        for (let i = gs.textoFlotante.length - 1; i >= 0; i--) {
+          const t = gs.textoFlotante[i]
+          t.tiempoVida += dt
+          t.opacidad = Math.max(0, 1 - t.tiempoVida)
+          
+          if (t.tiempoVida >= 1) {
+            gs.textoFlotante.splice(i, 1)
           }
         }
 
@@ -324,7 +409,7 @@ function MotorJuego() {
           gs.temporizadorRafaga = MIN_INTERVALO_RAFAGA + Math.random() * (MAX_INTERVALO_RAFAGA - MIN_INTERVALO_RAFAGA)
         }
 
-        // Spawn enemigos verdes (optimizado)
+        // Spawn enemigos verdes
         const puntajeActual = jugadorActual === 1 ? puntuacionJ1 : puntuacionJ2
         if (puntajeActual > 100 && Math.random() < 0.005 && gs.enemigos.filter(e => e.type === 'green').length < 2) {
           const desdeLaIzquierda = Math.random() < 0.5
@@ -351,7 +436,7 @@ function MotorJuego() {
           })
         }
 
-        // Mover enemigos (mantener la lógica existente)
+        // Mover enemigos
         for (let i = gs.enemigos.length - 1; i >= 0; i--) {
           const e = gs.enemigos[i]
           let nx = e.x
@@ -397,7 +482,7 @@ function MotorJuego() {
                     y: ny + 12,
                     vx: vxBullet,
                     vy: vyBullet,
-                    tipo: 'enemigo' // ✅ AÑADIDO: Identifica como bala enemiga
+                    tipo: 'enemigo'
                   });
                   fireCooldown = 1 + Math.random() * 2;
                 }
@@ -448,7 +533,7 @@ function MotorJuego() {
                   y: ny + 12,
                   vx: vxBullet,
                   vy: vyBullet,
-                  tipo: 'enemigo' // ✅ AÑADIDO: Identifica como bala enemiga
+                  tipo: 'enemigo'
                 })
                 fireCooldown = 1 + Math.random() * 2
               }
@@ -463,7 +548,7 @@ function MotorJuego() {
           e.fireCooldown = fireCooldown
         }
 
-        // Mover balas enemigas (optimizado)
+        // Mover balas enemigas
         for (let i = gs.balasEnemigos.length - 1; i >= 0; i--) {
           const b = gs.balasEnemigos[i]
           b.x += b.vx * dt
@@ -474,7 +559,7 @@ function MotorJuego() {
           }
         }
 
-        // Colisiones (optimizadas)
+        // Colisiones
         // Balas jugador vs enemigos
         for (let bi = gs.balas.length - 1; bi >= 0; bi--) {
           const b = gs.balas[bi]
@@ -545,7 +630,7 @@ function MotorJuego() {
     return () => {
       if (animId) cancelAnimationFrame(animId)
     }
-  }, [teclas, movimientoTactil, disparoTactil, jugadorActual, puntuacionJ1, puntuacionJ2, modoJuego, pausarJuego, finalizarJuego, setPuntuacion, setVidas, actualizarEstadoVisual, manejarPerdidaVida])
+  }, [teclas, movimientoTactil, disparoTactil, jugadorActual, puntuacionJ1, puntuacionJ2, vidasJ1, vidasJ2, modoJuego, pausarJuego, finalizarJuego, setPuntuacion, setVidas, actualizarEstadoVisual, manejarPerdidaVida])
 
   return (
     <div className="nes-screen" style={{
@@ -588,6 +673,15 @@ function MotorJuego() {
 
       {estadoVisual.enemigos.map((en, i) => (
         <Enemigo key={`enemigo-${i}`} enemigo={en} />
+      ))}
+
+      {/* POWER-UPS */}
+      {estadoVisual.powerUps.map((p, i) => (
+        <PowerUp 
+          key={`powerup-${i}`} 
+          powerUp={p} 
+          textoFlotante={estadoVisual.textoFlotante}
+        />
       ))}
 
       {/* Controles táctiles */}

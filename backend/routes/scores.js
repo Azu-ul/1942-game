@@ -86,6 +86,8 @@ router.get('/couples', async (req, res) => {
 })
 
 // POST new couples score
+// POST new couples score - Con lógica para mantener solo el más alto por pareja (sin importar orden)
+// POST new couples score - Con lógica para mantener solo el más alto por pareja (sin importar orden)
 router.post('/couples', async (req, res) => {
   const { player1_initials, player1_score, player2_initials, player2_score, total_score } = req.body
 
@@ -94,23 +96,61 @@ router.post('/couples', async (req, res) => {
   }
 
   try {
-    const [result] = await pool.query(
-      `INSERT INTO couples_scores 
-       (player1_initials, player1_score, player2_initials, player2_score, total_score) 
-       VALUES (?, ?, ?, ?, ?)`,
-      [player1_initials, player1_score, player2_initials, player2_score, total_score]
+    // Buscar si ya existe un registro con esta pareja (en cualquier orden)
+    const [existing] = await pool.query(
+      `SELECT id, total_score, player1_initials, player2_initials 
+       FROM couples_scores 
+       WHERE (player1_initials = ? AND player2_initials = ?) 
+          OR (player1_initials = ? AND player2_initials = ?)`,
+      [player1_initials, player2_initials, player2_initials, player1_initials]
     )
 
-    res.json({
-      ok: true,
-      id: result.insertId,
-      inserted: true,
-      message: `Nuevo score de pareja guardado: ${player1_initials}(${player1_score}) + ${player2_initials}(${player2_score}) = ${total_score}`
-    })
+    if (existing.length > 0) {
+      const currentRecord = existing[0]
+      const currentTotal = currentRecord.total_score
+
+      if (total_score > currentTotal) {
+        // Actualizar el registro existente (manteniendo el orden original de los jugadores)
+        const [result] = await pool.query(
+          `UPDATE couples_scores 
+           SET player1_score = ?, player2_score = ?, total_score = ? 
+           WHERE id = ?`,
+          [player1_score, player2_score, total_score, currentRecord.id]
+        )
+
+        res.json({
+          ok: true,
+          id: currentRecord.id,
+          updated: true,
+          message: `Score de pareja actualizado: ${currentRecord.player1_initials}(${currentRecord.player1_score}) + ${currentRecord.player2_initials}(${currentRecord.player2_score}) = ${currentTotal} → ${total_score}`
+        })
+      } else {
+        res.json({
+          ok: true,
+          kept_existing: true,
+          message: `Score existente para la pareja (${currentRecord.player1_initials} + ${currentRecord.player2_initials} = ${currentTotal}) es igual o mayor que el nuevo (${total_score})`
+        })
+      }
+    } else {
+      // Insertar nuevo registro
+      const [result] = await pool.query(
+        `INSERT INTO couples_scores 
+         (player1_initials, player1_score, player2_initials, player2_score, total_score) 
+         VALUES (?, ?, ?, ?, ?)`,
+        [player1_initials, player1_score, player2_initials, player2_score, total_score]
+      )
+
+      res.json({
+        ok: true,
+        id: result.insertId,
+        inserted: true,
+        message: `Nuevo score de pareja guardado: ${player1_initials}(${player1_score}) + ${player2_initials}(${player2_score}) = ${total_score}`
+      })
+    }
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ ok: false, error: 'Error al guardar score de pareja' })
+    console.error('🔥 ERROR EN /couples POST:', err.message)
+    console.error(err.stack)
+    res.status(500).json({ ok: false, error: 'Error al guardar score de pareja', details: err.message })
   }
 })
-
 export default router
