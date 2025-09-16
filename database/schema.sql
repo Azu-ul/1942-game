@@ -15,3 +15,16 @@ CREATE TABLE scores (
 CREATE INDEX idx_score ON scores (score DESC);
 
 SELECT * FROM scores ORDER BY score DESC;
+
+
+---------------------------------------------------------
+
+CREATE TABLE couples_scores (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  player1_initials VARCHAR(3) NOT NULL,
+  player1_score INT NOT NULL,
+  player2_initials VARCHAR(3) NOT NULL,
+  player2_score INT NOT NULL,
+  total_score INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

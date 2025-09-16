@@ -3,38 +3,37 @@ import { pool } from '../db.js'
 
 const router = Router()
 
-// GET top 10 scores
-router.get('/', async (req, res) => {
+// ======================
+// INDIVIDUAL SCORES
+// ======================
+
+// GET top 10 individual scores
+router.get('/scores', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM scores ORDER BY score DESC LIMIT 10')
     res.json(rows)
   } catch (err) {
     console.error(err)
-    res.status(500).json({ ok: false, error: 'Error al obtener scores' })
+    res.status(500).json({ ok: false, error: 'Error al obtener scores individuales' })
   }
 })
 
-// POST new score - Con lógica para mantener solo el más alto por iniciales
-router.post('/', async (req, res) => {
+// POST new individual score - Con lógica para mantener solo el más alto por iniciales
+router.post('/scores', async (req, res) => {
   const { initials, score } = req.body
   if (!initials || score === undefined || score === null) {
     return res.status(400).json({ ok: false, error: 'Faltan datos' })
   }
 
-
   try {
-    // Primero verificamos si ya existe un record con esas iniciales
     const [existing] = await pool.query(
       'SELECT id, score FROM scores WHERE initials = ?',
       [initials]
     )
 
     if (existing.length > 0) {
-      // Si existe, comparamos los scores
       const currentScore = existing[0].score
-
       if (score > currentScore) {
-        // El nuevo score es más alto, actualizamos
         const [result] = await pool.query(
           'UPDATE scores SET score = ?, created_at = CURRENT_TIMESTAMP WHERE initials = ?',
           [score, initials]
@@ -46,7 +45,6 @@ router.post('/', async (req, res) => {
           message: `Score actualizado para ${initials}: ${currentScore} → ${score}`
         })
       } else {
-        // El score actual es igual o más alto, no hacemos nada
         res.json({
           ok: true,
           kept_existing: true,
@@ -54,7 +52,6 @@ router.post('/', async (req, res) => {
         })
       }
     } else {
-      // No existe, insertamos nuevo record
       const [result] = await pool.query(
         'INSERT INTO scores (initials, score) VALUES (?, ?)',
         [initials, score]
@@ -68,21 +65,51 @@ router.post('/', async (req, res) => {
     }
   } catch (err) {
     console.error(err)
-    res.status(500).json({ ok: false, error: 'Error al guardar score' })
+    res.status(500).json({ ok: false, error: 'Error al guardar score individual' })
   }
 })
 
-// DELETE endpoint para limpiar scores (opcional, para testing)
-router.delete('/clear', async (req, res) => {
+// ======================
+// COUPLES SCORES
+// ======================
+
+// GET top 10 couples scores
+router.get('/couples', async (req, res) => {
   try {
-    const [result] = await pool.query('DELETE FROM scores')
+    const [rows] = await pool.query('SELECT * FROM couples_scores ORDER BY total_score DESC LIMIT 10')
+    res.json(rows)
+  } catch (err) {
+    console.error(err)
+    // Devolvemos array vacío si hay error, como sugiere el cliente
+    res.json([])
+  }
+})
+
+// POST new couples score
+router.post('/couples', async (req, res) => {
+  const { player1_initials, player1_score, player2_initials, player2_score, total_score } = req.body
+
+  if (!player1_initials || player1_score === undefined || !player2_initials || player2_score === undefined || total_score === undefined) {
+    return res.status(400).json({ ok: false, error: 'Faltan datos para la pareja' })
+  }
+
+  try {
+    const [result] = await pool.query(
+      `INSERT INTO couples_scores 
+       (player1_initials, player1_score, player2_initials, player2_score, total_score) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [player1_initials, player1_score, player2_initials, player2_score, total_score]
+    )
+
     res.json({
       ok: true,
-      message: `${result.affectedRows} records eliminados`
+      id: result.insertId,
+      inserted: true,
+      message: `Nuevo score de pareja guardado: ${player1_initials}(${player1_score}) + ${player2_initials}(${player2_score}) = ${total_score}`
     })
   } catch (err) {
     console.error(err)
-    res.status(500).json({ ok: false, error: 'Error al limpiar scores' })
+    res.status(500).json({ ok: false, error: 'Error al guardar score de pareja' })
   }
 })
 

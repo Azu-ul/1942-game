@@ -6,16 +6,26 @@ import MotorJuego from './components/MotorJuego'
 import PantallaPausa from './components/PantallaPausa'
 import PantallaGameOver from './components/PantallaGameOver'
 import PantallaRanking from './components/PantallaRanking'
+import PantallaCambioTurno from './components/PantallaCambioTurno'
 
 // Componente que maneja la lógica del juego principal
 function JuegoCompleto1942() {
   const { 
-    estadoJuego, 
-    puntuacion,
+    estadoJuego,
+    modoJuego,
+    jugadorActual,
+    puntuacionJ1,
+    puntuacionJ2,
+    vidasJ1,
+    vidasJ2,
+    puntuacionTotal,
     puntajesAltos, 
+    puntajesParejas,
     setPuntajesAltos,
+    setPuntajesParejas,
     setCargandoPuntajes, 
-    setErrorPuntajes 
+    setErrorPuntajes,
+    setJugadorActual
   } = useContextoJuego()
 
   // Manejo global del botón de pausa con ESC
@@ -31,7 +41,7 @@ function JuegoCompleto1942() {
     return () => window.removeEventListener('keydown', manejarTeclado)
   }, [])
 
-  // Cargar puntajes desde la base de datos
+  // Cargar puntajes individuales desde la base de datos
   const cargarPuntajesAltos = async () => {
     setCargandoPuntajes(true)
     setErrorPuntajes(null)
@@ -49,7 +59,25 @@ function JuegoCompleto1942() {
     }
   }
 
-  // Guardar puntaje en la base de datos
+  // Cargar puntajes de parejas desde la base de datos
+  const cargarPuntajesParejas = async () => {
+    setCargandoPuntajes(true)
+    setErrorPuntajes(null)
+    try {
+      const puntajes = await apiPuntajes.obtenerParejas()
+      setPuntajesParejas(puntajes)
+      return puntajes
+    } catch (error) {
+      console.error('Error loading couples scores:', error)
+      setErrorPuntajes(error.message)
+      setPuntajesParejas([])
+      return []
+    } finally {
+      setCargandoPuntajes(false)
+    }
+  }
+
+  // Guardar puntaje individual en la base de datos
   const guardarPuntaje = async (iniciales, puntajeJugador) => {
     try {
       const resultado = await apiPuntajes.crear(iniciales, puntajeJugador)
@@ -61,34 +89,75 @@ function JuegoCompleto1942() {
     }
   }
 
-  // Obtener ranking del puntaje actual - CORREGIDO
-  const obtenerRankingPuntaje = () => {
-    // Si no hay puntajes cargados, cargarlos primero
+  // Guardar puntaje de pareja en la base de datos
+  const guardarPuntajePareja = async (inicialesJ1, inicialesJ2) => {
+    try {
+      const resultado = await apiPuntajes.crearPareja(inicialesJ1, puntuacionJ1, inicialesJ2, puntuacionJ2)
+      await cargarPuntajesParejas()
+      return resultado
+    } catch (error) {
+      console.error('Error saving couples score:', error)
+      throw error
+    }
+  }
+
+  // Obtener ranking del puntaje actual individual
+  const obtenerRankingPuntaje = (puntajeJugador) => {
     if (!puntajesAltos || puntajesAltos.length === 0) {
-      return puntuacion > 0 ? 1 : null // Si hay puntaje pero no hay records, es #1
+      return puntajeJugador > 0 ? 1 : null
     }
 
-    // Crear array temporal con los puntajes existentes más el actual
-    const puntajesTemp = [...puntajesAltos, { initials: 'YOU', score: puntuacion }]
-      .sort((a, b) => b.score - a.score) // Ordenar de mayor a menor
+    const puntajesTemp = [...puntajesAltos, { initials: 'YOU', score: puntajeJugador }]
+      .sort((a, b) => b.score - a.score)
     
-    // Encontrar la posición del puntaje actual
-    const posicion = puntajesTemp.findIndex(p => p.initials === 'YOU' && p.score === puntuacion)
+    const posicion = puntajesTemp.findIndex(p => p.initials === 'YOU' && p.score === puntajeJugador)
     
-    // Solo devolver la posición si está en el top 10 (índices 0-9)
     return (posicion >= 0 && posicion < 10) ? posicion + 1 : null
   }
+
+  // Obtener ranking del puntaje total de la pareja
+  const obtenerRankingPareja = () => {
+    if (!puntajesParejas || puntajesParejas.length === 0) {
+      return puntuacionTotal > 0 ? 1 : null
+    }
+
+    const puntajesTemp = [...puntajesParejas, { total_score: puntuacionTotal }]
+      .sort((a, b) => b.total_score - a.total_score)
+    
+    const posicion = puntajesTemp.findIndex(p => p.total_score === puntuacionTotal)
+    
+    return (posicion >= 0 && posicion < 10) ? posicion + 1 : null
+  }
+
+  // Detectar cambio de turno por muerte del jugador
+  const [jugadorAnterior, setJugadorAnterior] = React.useState(1)
+  const [mostrandoCambioTurno, setMostrandoCambioTurno] = React.useState(false)
+
+  useEffect(() => {
+    if (modoJuego === '2P' && estadoJuego === 'playing' && jugadorActual !== jugadorAnterior) {
+      // Se cambió de jugador
+      setMostrandoCambioTurno(true)
+      setJugadorAnterior(jugadorActual)
+      
+      // Ocultar pantalla de cambio después de 3 segundos
+      setTimeout(() => {
+        setMostrandoCambioTurno(false)
+      }, 3000)
+    }
+  }, [jugadorActual, jugadorAnterior, modoJuego, estadoJuego])
 
   // Cargar puntajes al inicio y cuando se muestra el ranking
   useEffect(() => {
     if (estadoJuego === 'ranking') {
       cargarPuntajesAltos()
+      cargarPuntajesParejas()
     }
   }, [estadoJuego])
 
   // Cargar puntajes al montar el componente
   useEffect(() => {
     cargarPuntajesAltos()
+    cargarPuntajesParejas()
   }, [])
 
   return (
@@ -96,14 +165,25 @@ function JuegoCompleto1942() {
       <div className="game-wrapper">
         {estadoJuego === 'start' && <PantallaInicio />}
         
-        {estadoJuego === 'playing' && <MotorJuego />}
+        {estadoJuego === 'playing' && (
+          <>
+            {mostrandoCambioTurno && modoJuego === '2P' ? (
+              <PantallaCambioTurno />
+            ) : (
+              <MotorJuego />
+            )}
+          </>
+        )}
         
         {estadoJuego === 'paused' && <PantallaPausa />}
         
         {estadoJuego === 'gameOver' && (
           <PantallaGameOver
             onGuardarPuntaje={guardarPuntaje}
-            ranking={obtenerRankingPuntaje()}
+            onGuardarPuntajePareja={guardarPuntajePareja}
+            rankingJ1={obtenerRankingPuntaje(puntuacionJ1)}
+            rankingJ2={obtenerRankingPuntaje(puntuacionJ2)}
+            rankingPareja={obtenerRankingPareja()}
           />
         )}
         

@@ -24,9 +24,23 @@ import {
 } from '../constants/constantesJuego'
 
 // Componente optimizado para mostrar vidas como avioncitos
-const VidasDisplay = React.memo(({ vidas, vidasPerdidas }) => {
+const VidasDisplay = React.memo(({ vidas, vidasPerdidas, jugador }) => {
   return (
-    <div className="position-absolute" style={{ bottom: '20px', left: '20px', zIndex: 20 }}>
+    <div className="position-absolute" style={{ 
+      bottom: jugador === 1 ? '20px' : '60px', 
+      left: '20px', 
+      zIndex: 20 
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '14px',
+        color: jugador === 1 ? '#00ff00' : '#ffff00',
+        marginBottom: '5px'
+      }}>
+        P{jugador}
+      </div>
       <div style={{ display: 'flex', gap: '5px' }}>
         {[...Array(3)].map((_, i) => (
           <img
@@ -54,34 +68,80 @@ const VidasDisplay = React.memo(({ vidas, vidasPerdidas }) => {
   )
 })
 
-// Componente HUD optimizado estilo NES
-const HUDDisplay = React.memo(({ puntuacion, puntajeMaximo }) => {
-  return (
-    <div className="position-absolute top-0 w-100 d-flex justify-content-between align-items-center p-2"
-      style={{ fontSize: '14px', color: 'white', zIndex: 20 }}>
-      <div>1UP</div>
-      <div style={{ marginLeft: '10px' }}>{puntuacion.toLocaleString().padStart(8, '0')}</div>
+// Componente HUD optimizado para 2 jugadores
+const HUDDisplay = React.memo(({ 
+  modoJuego, 
+  jugadorActual, 
+  puntuacionJ1, 
+  puntuacionJ2, 
+  puntajeMaximo, 
+  puntajeMaximoPareja 
+}) => {
+  if (modoJuego === '1P') {
+    return (
+      <div className="position-absolute top-0 w-100 d-flex justify-content-between align-items-center p-2"
+        style={{ fontSize: '14px', color: 'white', zIndex: 20 }}>
+        <div>1UP</div>
+        <div style={{ marginLeft: '10px' }}>{puntuacionJ1.toLocaleString().padStart(8, '0')}</div>
 
-      <div style={{ textAlign: 'center', flex: 1 }}>
-        <div>HIGH SCORE</div>
-        <div>{puntajeMaximo.toLocaleString().padStart(8, '0')}</div>
+        <div style={{ textAlign: 'center', flex: 1 }}>
+          <div>HIGH SCORE</div>
+          <div>{puntajeMaximo.toLocaleString().padStart(8, '0')}</div>
+        </div>
+
+        <div>2UP</div>
+        <div style={{ marginLeft: '10px' }}>00000000</div>
       </div>
+    )
+  }
 
-      <div>2UP</div>
-      <div style={{ marginLeft: '10px' }}>00000000</div>
+  // Modo 2P
+  return (
+    <div className="position-absolute top-0 w-100 p-2" style={{ fontSize: '12px', color: 'white', zIndex: 20 }}>
+      {/* Primera fila */}
+      <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: '5px' }}>
+        <div style={{ color: jugadorActual === 1 ? '#00ff00' : 'white' }}>
+          P1: {puntuacionJ1.toLocaleString().padStart(8, '0')}
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div>2P HIGH SCORE</div>
+          <div>{puntajeMaximoPareja.toLocaleString().padStart(8, '0')}</div>
+        </div>
+        <div style={{ color: jugadorActual === 2 ? '#ffff00' : 'white' }}>
+          P2: {puntuacionJ2.toLocaleString().padStart(8, '0')}
+        </div>
+      </div>
+      
+      {/* Segunda fila */}
+      <div className="text-center" style={{ fontSize: '14px' }}>
+        <div style={{ 
+          color: jugadorActual === 1 ? '#00ff00' : '#ffff00',
+          fontWeight: 'bold'
+        }}>
+          PLAYER {jugadorActual} TURN
+        </div>
+        <div style={{ fontSize: '10px', color: '#ccc' }}>
+          TOTAL: {(puntuacionJ1 + puntuacionJ2).toLocaleString()}
+        </div>
+      </div>
     </div>
   )
 })
 
 function MotorJuego() {
   const {
-    puntuacion,
+    modoJuego,
+    jugadorActual,
+    puntuacionJ1,
+    puntuacionJ2,
+    vidasJ1,
+    vidasJ2,
     setPuntuacion,
-    vidas,
     setVidas,
     pausarJuego,
     finalizarJuego,
-    puntajesAltos
+    puntajesAltos,
+    puntajesParejas
   } = useContextoJuego()
 
   const teclas = useTeclado()
@@ -108,7 +168,8 @@ function MotorJuego() {
   })
 
   // Estados para efectos visuales
-  const [vidasPerdidas, setVidasPerdidas] = useState([])
+  const [vidasPerdidasJ1, setVidasPerdidasJ1] = useState([])
+  const [vidasPerdidasJ2, setVidasPerdidasJ2] = useState([])
 
   // Controles táctiles
   const [movimientoTactil, setMovimientoTactil] = useState({ x: 0, y: 0, active: false })
@@ -120,6 +181,10 @@ function MotorJuego() {
 
   const puntajeMaximo = useMemo(() =>
     puntajesAltos.length > 0 ? puntajesAltos[0].score : 0, [puntajesAltos]
+  )
+
+  const puntajeMaximoPareja = useMemo(() =>
+    puntajesParejas.length > 0 ? puntajesParejas[0].total_score : 0, [puntajesParejas]
   )
 
   // Actualizar estado visual solo cada 2 frames para mejorar rendimiento
@@ -141,16 +206,21 @@ function MotorJuego() {
 
   // Efecto para parpadeo de vidas
   const manejarPerdidaVida = useCallback(() => {
-    const vidasActuales = estadoJuegoRef.current.vidas || vidas
-    const nuevaVidaPerdida = 3 - vidasActuales
+    const vidas = jugadorActual === 1 ? vidasJ1 : vidasJ2
+    const nuevaVidaPerdida = 3 - vidas
 
-    setVidasPerdidas(prev => [...prev, nuevaVidaPerdida])
-
-    // Quitar el parpadeo después de la animación
-    setTimeout(() => {
-      setVidasPerdidas(prev => prev.filter(v => v !== nuevaVidaPerdida))
-    }, 500)
-  }, [vidas])
+    if (jugadorActual === 1) {
+      setVidasPerdidasJ1(prev => [...prev, nuevaVidaPerdida])
+      setTimeout(() => {
+        setVidasPerdidasJ1(prev => prev.filter(v => v !== nuevaVidaPerdida))
+      }, 500)
+    } else {
+      setVidasPerdidasJ2(prev => [...prev, nuevaVidaPerdida])
+      setTimeout(() => {
+        setVidasPerdidasJ2(prev => prev.filter(v => v !== nuevaVidaPerdida))
+      }, 500)
+    }
+  }, [jugadorActual, vidasJ1, vidasJ2])
 
   useEffect(() => {
     if (teclas.Escape) {
@@ -253,7 +323,8 @@ function MotorJuego() {
         }
 
         // Spawn enemigos verdes (optimizado)
-        if (puntuacion > 100 && Math.random() < 0.005 && gs.enemigos.filter(e => e.type === 'green').length < 2) {
+        const puntajeActual = jugadorActual === 1 ? puntuacionJ1 : puntuacionJ2
+        if (puntajeActual > 100 && Math.random() < 0.005 && gs.enemigos.filter(e => e.type === 'green').length < 2) {
           const desdeLaIzquierda = Math.random() < 0.5
           const inicioX = desdeLaIzquierda ? -32 : ANCHO_JUEGO
           const inicioY = 100 + Math.random() * (ALTO_JUEGO - 200)
@@ -278,7 +349,7 @@ function MotorJuego() {
           })
         }
 
-        // Mover enemigos (optimizado)
+        // Mover enemigos (mantener la lógica existente)
         for (let i = gs.enemigos.length - 1; i >= 0; i--) {
           const e = gs.enemigos[i]
           let nx = e.x
@@ -296,16 +367,13 @@ function MotorJuego() {
               nx = e.centerX + Math.cos(e.angle) * e.radius;
               ny = e.centerY + Math.sin(e.angle) * e.radius;
 
-              // Calcular vector de movimiento
               const dx = nx - e.xPrev;
               const dy = ny - e.yPrev;
 
-              // Solo actualizar rotación si hay movimiento significativo
               if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
                 e.rotation = Math.atan2(dy, dx);
               }
 
-              // Actualizar posición previa
               e.xPrev = nx;
               e.yPrev = ny;
 
@@ -334,11 +402,7 @@ function MotorJuego() {
             } else if (state === 'exit') {
               const dir = e.centerX < ANCHO_JUEGO / 2 ? -1 : 1;
               nx += dir * e.speed * dt;
-
-              // ROTACIÓN SIMPLE: mira a la derecha (0) o izquierda (PI)
               e.rotation = dir > 0 ? 0 : Math.PI;
-
-              // Actualizar xPrev/yPrev también en exit para consistencia
               e.xPrev = nx;
               e.yPrev = ny;
 
@@ -387,7 +451,6 @@ function MotorJuego() {
             }
           }
 
-          // Actualizar propiedades del enemigo
           e.x = nx
           e.y = ny
           e.age = age
@@ -431,7 +494,9 @@ function MotorJuego() {
             manejarPerdidaVida()
             setVidas(prev => {
               const nuevasVidas = prev - 1
-              if (nuevasVidas <= 0) {
+              if (nuevasVidas <= 0 && modoJuego === '2P') {
+                // En modo 2P, el juego se maneja en el contexto
+              } else if (nuevasVidas <= 0) {
                 finalizarJuego()
               }
               return nuevasVidas
@@ -450,7 +515,9 @@ function MotorJuego() {
             manejarPerdidaVida()
             setVidas(prev => {
               const nuevasVidas = prev - 1
-              if (nuevasVidas <= 0) {
+              if (nuevasVidas <= 0 && modoJuego === '2P') {
+                // En modo 2P, el juego se maneja en el contexto
+              } else if (nuevasVidas <= 0) {
                 finalizarJuego()
               }
               return nuevasVidas
@@ -474,8 +541,7 @@ function MotorJuego() {
     return () => {
       if (animId) cancelAnimationFrame(animId)
     }
-  }, [teclas, movimientoTactil, disparoTactil, puntuacion, pausarJuego, finalizarJuego, setPuntuacion, setVidas, actualizarEstadoVisual, manejarPerdidaVida])
-
+  }, [teclas, movimientoTactil, disparoTactil, jugadorActual, puntuacionJ1, puntuacionJ2, modoJuego, pausarJuego, finalizarJuego, setPuntuacion, setVidas, actualizarEstadoVisual, manejarPerdidaVida])
 
   return (
     <div className="nes-screen" style={{
@@ -486,10 +552,24 @@ function MotorJuego() {
     }}>
 
       {/* HUD */}
-      <HUDDisplay puntuacion={puntuacion} puntajeMaximo={puntajeMaximo} />
+      <HUDDisplay 
+        modoJuego={modoJuego}
+        jugadorActual={jugadorActual}
+        puntuacionJ1={puntuacionJ1}
+        puntuacionJ2={puntuacionJ2}
+        puntajeMaximo={puntajeMaximo}
+        puntajeMaximoPareja={puntajeMaximoPareja}
+      />
 
       {/* VIDAS */}
-      <VidasDisplay vidas={vidas} vidasPerdidas={vidasPerdidas} />
+      {modoJuego === '1P' ? (
+        <VidasDisplay vidas={vidasJ1} vidasPerdidas={vidasPerdidasJ1} jugador={1} />
+      ) : (
+        <>
+          <VidasDisplay vidas={vidasJ1} vidasPerdidas={vidasPerdidasJ1} jugador={1} />
+          <VidasDisplay vidas={vidasJ2} vidasPerdidas={vidasPerdidasJ2} jugador={2} />
+        </>
+      )}
 
       {/* ELEMENTOS DEL JUEGO */}
       <Jugador jugador={estadoVisual.jugador} />

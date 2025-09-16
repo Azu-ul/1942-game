@@ -7,19 +7,27 @@ function PantallaInicio() {
   const { iniciarJuego, mostrarRanking } = useContextoJuego()
   const [mostrarInstrucciones, setMostrarInstrucciones] = useState(false)
   const [puntajeMaximo, setPuntajeMaximo] = useState(0)
+  const [puntajeMaximoPareja, setPuntajeMaximoPareja] = useState(0)
 
   useEffect(() => {
-    const cargarPuntajeMaximo = async () => {
+    const cargarPuntajesMaximos = async () => {
       try {
+        // Cargar puntaje máximo individual
         const puntajes = await apiPuntajes.obtenerTodos()
         if (puntajes.length > 0) {
           setPuntajeMaximo(puntajes[0].score)
         }
+
+        // Cargar puntaje máximo de parejas
+        const puntajesParejas = await apiPuntajes.obtenerParejas()
+        if (puntajesParejas.length > 0) {
+          setPuntajeMaximoPareja(puntajesParejas[0].total_score)
+        }
       } catch (e) {
-        console.error("No se pudo cargar HI SCORE")
+        console.error("No se pudo cargar HI SCORES")
       }
     }
-    cargarPuntajeMaximo()
+    cargarPuntajesMaximos()
   }, [])
 
   if (mostrarInstrucciones) {
@@ -43,9 +51,26 @@ function PantallaInicio() {
           </h4>
           
           <div style={{ marginBottom: '25px' }}>
-            <p style={{ marginBottom: '10px' }}>← → ↑ ↓ : MOVER</p>
+            <p style={{ marginBottom: '10px' }}>← ↑ → ↓ : MOVER</p>
             <p style={{ marginBottom: '10px' }}>ESPACIO : DISPARAR</p>
             <p style={{ marginBottom: '10px' }}>ESC : PAUSA</p>
+          </div>
+
+          <div style={{ 
+            borderTop: '2px solid white', 
+            paddingTop: '20px',
+            marginBottom: '25px'
+          }}>
+            <h5 style={{ 
+              fontSize: '18px', 
+              marginBottom: '15px',
+              color: '#00ff00'
+            }}>
+              MODO 2 JUGADORES
+            </h5>
+            <p style={{ marginBottom: '8px', fontSize: '14px' }}>Los jugadores se turnan cuando uno pierde todas sus vidas</p>
+            <p style={{ marginBottom: '8px', fontSize: '14px' }}>El juego termina cuando ambos jugadores se quedan sin vidas</p>
+            <p style={{ marginBottom: '8px', fontSize: '14px' }}>Se guarda el puntaje combinado de la pareja</p>
           </div>
           
           <div style={{ 
@@ -96,18 +121,26 @@ function PantallaInicio() {
       alignItems: 'center',
       padding: '20px'
     }}>
-      {/* HI SCORE arriba a la derecha */}
+      {/* HI SCORES arriba a la derecha */}
       <div style={{
         position: 'absolute',
         top: '15px',
         right: '15px',
         textAlign: 'right',
         color: 'white',
-        fontSize: '14px'
+        fontSize: '12px'
       }}>
-        <div style={{ marginBottom: '5px' }}>HI SCORE</div>
-        <div style={{ color: '#ffff00' }}>
-          {puntajeMaximo.toLocaleString().padStart(8, '0')}
+        <div style={{ marginBottom: '10px' }}>
+          <div style={{ marginBottom: '5px' }}>1P HI SCORE</div>
+          <div style={{ color: '#ffff00' }}>
+            {puntajeMaximo.toLocaleString().padStart(8, '0')}
+          </div>
+        </div>
+        <div>
+          <div style={{ marginBottom: '5px' }}>2P HI SCORE</div>
+          <div style={{ color: '#00ff00' }}>
+            {puntajeMaximoPareja.toLocaleString().padStart(8, '0')}
+          </div>
         </div>
       </div>
 
@@ -141,7 +174,7 @@ function PantallaInicio() {
         marginBottom: '50px'
       }}>
         <div 
-          onClick={iniciarJuego} 
+          onClick={() => iniciarJuego('1P')} 
           style={{ 
             cursor: 'pointer',
             fontSize: '24px',
@@ -163,6 +196,31 @@ function PantallaInicio() {
           }}
         >
           1 PLAYER
+        </div>
+
+        <div 
+          onClick={() => iniciarJuego('2P')} 
+          style={{ 
+            cursor: 'pointer',
+            fontSize: '24px',
+            padding: '15px 30px',
+            border: '2px solid white',
+            backgroundColor: 'transparent',
+            color: 'white',
+            textAlign: 'center',
+            minWidth: '280px',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = 'white'
+            e.target.style.color = 'black'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent'
+            e.target.style.color = 'white'
+          }}
+        >
+          2 PLAYERS
         </div>
         
         <div 

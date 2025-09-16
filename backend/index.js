@@ -8,7 +8,7 @@ app.use(cors())
 app.use(express.json())
 
 
-app.use('/scores', scoresRoutes)
+app.use('/', scoresRoutes)
 
 app.get('/', (req, res) => {
   res.send('Servidor 1942 funcionando 🚀');
