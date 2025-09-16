@@ -62,6 +62,15 @@ function JoystickVirtual({ onMover, onDisparar, style }) {
   }
 
   useEffect(() => {
+    // ✅ Manejador para touchstart (registrado manualmente con passive: false)
+    const manejarTouchStart = (e) => {
+      e.preventDefault()
+      if (e.touches.length > 0) {
+        const touch = e.touches[0]
+        manejarInicio(touch.clientX, touch.clientY)
+      }
+    }
+
     const manejarTouchMove = (e) => {
       if (arrastrando && e.touches.length > 0) {
         const touch = e.touches[0]
@@ -71,13 +80,23 @@ function JoystickVirtual({ onMover, onDisparar, style }) {
 
     const manejarTouchEnd = () => manejarFin()
 
+    // ✅ Registrar touchstart en el contenedor
+    if (containerRef.current) {
+      containerRef.current.addEventListener('touchstart', manejarTouchStart, { passive: false })
+    }
+
+    // ✅ Registrar eventos globales solo si estamos arrastrando
     if (arrastrando) {
       window.addEventListener('touchmove', manejarTouchMove, { passive: false })
       window.addEventListener('touchend', manejarTouchEnd)
       window.addEventListener('mouseup', manejarFin)
     }
 
+    // ✅ Cleanup
     return () => {
+      if (containerRef.current) {
+        containerRef.current.removeEventListener('touchstart', manejarTouchStart)
+      }
       window.removeEventListener('touchmove', manejarTouchMove)
       window.removeEventListener('touchend', manejarTouchEnd)
       window.removeEventListener('mouseup', manejarFin)
@@ -98,11 +117,7 @@ function JoystickVirtual({ onMover, onDisparar, style }) {
         alignItems: 'center',
         ...style
       }}
-      onTouchStart={(e) => {
-        e.preventDefault()
-        const touch = e.touches[0]
-        manejarInicio(touch.clientX, touch.clientY)
-      }}
+      // ❌ onTouchStart REMOVIDO — ahora se registra en useEffect
       onMouseDown={(e) => {
         e.preventDefault()
         manejarInicio(e.clientX, e.clientY)
