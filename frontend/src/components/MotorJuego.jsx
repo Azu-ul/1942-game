@@ -43,7 +43,7 @@ const VidasDisplay = React.memo(({ vidas, vidasPerdidas }) => {
           />
         ))}
       </div>
-      <style jsx>{`
+      <style>{`
         @keyframes parpadeo {
           0% { opacity: 1; }
           50% { opacity: 0; }
@@ -290,23 +290,22 @@ function MotorJuego() {
 
           if (e.type === 'green') {
             if (state === 'circle') {
-              const deltaAngle = e.speed * dt / e.radius
-              e.angle += deltaAngle
+              const deltaAngle = e.speed * dt / e.radius;
+              e.angle += deltaAngle;
 
-              nx = e.centerX + Math.cos(e.angle) * e.radius
-              ny = e.centerY + Math.sin(e.angle) * e.radius
+              nx = e.centerX + Math.cos(e.angle) * e.radius;
+              ny = e.centerY + Math.sin(e.angle) * e.radius;
 
-              // >>> CALCULAR ROTACIÓN BASADA EN LA DIRECCIÓN DEL MOVIMIENTO <<<
-              // Velocidad instantánea en X e Y
-              const dx = nx - e.xPrev; // cambio en X desde el último frame
-              const dy = ny - e.yPrev; // cambio en Y desde el último frame
+              // Calcular vector de movimiento
+              const dx = nx - e.xPrev;
+              const dy = ny - e.yPrev;
 
-              // Si hay movimiento, calcular el ángulo
-              if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
-                e.rotation = Math.atan2(dy, dx); // atan2(dy, dx) da el ángulo en radianes
+              // Solo actualizar rotación si hay movimiento significativo
+              if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+                e.rotation = Math.atan2(dy, dx);
               }
 
-              // Guardar posición actual como previa para el próximo frame
+              // Actualizar posición previa
               e.xPrev = nx;
               e.yPrev = ny;
 
@@ -317,35 +316,35 @@ function MotorJuego() {
               }
 
               if (fireCooldown <= 0) {
-                const dx = (gs.jugador.x + 14) - (nx + 14)
-                const dy = (gs.jugador.y + 14) - (ny + 14)
-                const dist = Math.hypot(dx, dy)
+                const dx = (gs.jugador.x + 14) - (nx + 14);
+                const dy = (gs.jugador.y + 14) - (ny + 14);
+                const dist = Math.hypot(dx, dy);
                 if (dist > 0) {
-                  const vxBullet = dx / dist * VELOCIDAD_BALA_ENEMIGO
-                  const vyBullet = dy / dist * VELOCIDAD_BALA_ENEMIGO
+                  const vxBullet = dx / dist * VELOCIDAD_BALA_ENEMIGO;
+                  const vyBullet = dy / dist * VELOCIDAD_BALA_ENEMIGO;
                   gs.balasEnemigos.push({
                     x: nx + 12,
                     y: ny + 12,
                     vx: vxBullet,
                     vy: vyBullet
-                  })
-                  fireCooldown = 1 + Math.random() * 2
+                  });
+                  fireCooldown = 1 + Math.random() * 2;
                 }
               }
             } else if (state === 'exit') {
-              const dir = e.centerX < ANCHO_JUEGO / 2 ? -1 : 1
-              nx += dir * e.speed * dt
+              const dir = e.centerX < ANCHO_JUEGO / 2 ? -1 : 1;
+              nx += dir * e.speed * dt;
 
-              // >>> ROTACIÓN EN MOVIMIENTO LINEAL <<<
-              const targetAngle = Math.atan2(dy, dx);
-              const diff = targetAngle - e.rotation;
-              // Normalizar diferencia de ángulo
-              const normalizedDiff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI;
-              e.rotation += normalizedDiff * 0.2; // 20% de la diferencia por frame
+              // ROTACIÓN SIMPLE: mira a la derecha (0) o izquierda (PI)
+              e.rotation = dir > 0 ? 0 : Math.PI;
+
+              // Actualizar xPrev/yPrev también en exit para consistencia
+              e.xPrev = nx;
+              e.yPrev = ny;
 
               if (nx < -32 || nx > ANCHO_JUEGO) {
-                gs.enemigos.splice(i, 1)
-                continue
+                gs.enemigos.splice(i, 1);
+                continue;
               }
             }
           } else {
