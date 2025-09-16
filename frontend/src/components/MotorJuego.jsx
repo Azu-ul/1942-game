@@ -1,3 +1,4 @@
+// MotorJuego.jsx
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useContextoJuego } from '../contexts/ContextoJuego'
 import useTeclado from '../hooks/useTeclado'
@@ -281,7 +282,8 @@ function MotorJuego() {
             x: gs.jugador.x + 12,
             y: gs.jugador.y - 20,
             vx: 0,
-            vy: -VELOCIDAD_BALA
+            vy: -VELOCIDAD_BALA,
+            tipo: 'jugador' // ✅ AÑADIDO: Identifica como bala del jugador
           })
           gs.tiempoRecargaBala = TIEMPO_RECARGA_BALA
         }
@@ -394,7 +396,8 @@ function MotorJuego() {
                     x: nx + 12,
                     y: ny + 12,
                     vx: vxBullet,
-                    vy: vyBullet
+                    vy: vyBullet,
+                    tipo: 'enemigo' // ✅ AÑADIDO: Identifica como bala enemiga
                   });
                   fireCooldown = 1 + Math.random() * 2;
                 }
@@ -444,7 +447,8 @@ function MotorJuego() {
                   x: nx + 12,
                   y: ny + 12,
                   vx: vxBullet,
-                  vy: vyBullet
+                  vy: vyBullet,
+                  tipo: 'enemigo' // ✅ AÑADIDO: Identifica como bala enemiga
                 })
                 fireCooldown = 1 + Math.random() * 2
               }

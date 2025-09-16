@@ -175,7 +175,6 @@ function PantallaRanking() {
                     }}>
                       <span style={{ minWidth: '30px' }}>POS</span>
                       <span style={{ minWidth: '100px' }}>COUPLE</span>
-                      <span style={{ minWidth: '80px', textAlign: 'right' }}>INDIVIDUAL</span>
                       <span style={{ minWidth: '100px', textAlign: 'right' }}>TOTAL</span>
                     </div>
 
@@ -190,7 +189,7 @@ function PantallaRanking() {
                           padding: '6px 15px',
                           backgroundColor: index % 2 === 0 ? 'rgba(255,255,255,0.1)' : 'transparent',
                           color: 'white',
-                          fontSize: '14px',
+                          fontSize: '18px',
                           border: '1px solid rgba(255,255,255,0.2)'
                         }}
                       >
@@ -206,13 +205,6 @@ function PantallaRanking() {
                           color: index < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][index] : '#00ff00'
                         }}>
                           {pareja.player1_initials} & {pareja.player2_initials}
-                        </span>
-                        <span style={{
-                          minWidth: '80px',
-                          textAlign: 'right',
-                          fontFamily: 'monospace'
-                        }}>
-                          {pareja.player1_score.toLocaleString().padStart(5, '0')}
                         </span>
                         <span style={{
                           minWidth: '100px',

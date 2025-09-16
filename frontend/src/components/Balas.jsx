@@ -1,9 +1,9 @@
+// Balas.jsx
 import React from 'react'
 
 function Balas({ bala }) {
-  const esBalaJugador = bala.vy < 0
-  
-  if (esBalaJugador) {
+  // ✅ Usamos el tipo explícito que viene desde MotorJuego
+  if (bala.tipo === 'jugador') {
     return (
       <img
         src="/assets/bala2.png"
@@ -21,7 +21,7 @@ function Balas({ bala }) {
       />
     )
   } else {
-    // Balas enemigas se mantienen como círculos rojos
+    // Balas enemigas: siempre círculos rojos, sin importar dirección
     return (
       <div
         className="position-absolute"
