@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useContextoJuego } from '../contexts/ContextoJuego'
 import { apiPuntajes } from '../services/apiPuntajes'
-import { ANCHO_JUEGO, ALTO_JUEGO } from '../constants/constantesJuego'
 
 function PantallaInicio() {
   const { iniciarJuego, mostrarRanking } = useContextoJuego()
@@ -32,112 +31,95 @@ function PantallaInicio() {
 
   if (mostrarInstrucciones) {
     return (
-      <div className="nes-screen" style={{ 
-        width: ANCHO_JUEGO, 
-        height: ALTO_JUEGO,
-        padding: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        <div className="text-center text-white" style={{ 
-          fontSize: '16px', 
+      <div className="nes-screen">
+        <div style={{ 
+          textAlign: 'center',
           maxWidth: '90%',
-          lineHeight: '1.8'
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          padding: '1em'
         }}>
-          <h4 style={{ marginBottom: '30px', fontSize: '24px', color: '#ffff00' }}>
+          <h4 style={{ 
+            marginBottom: '1.5em', 
+            color: '#ffff00' 
+          }}>
             CONTROLES
           </h4>
           
-          <div style={{ marginBottom: '25px' }}>
-            <p style={{ marginBottom: '10px' }}>← ↑ → ↓ : MOVER</p>
-            <p style={{ marginBottom: '10px' }}>ESPACIO : DISPARAR</p>
-            <p style={{ marginBottom: '10px' }}>ESC : PAUSA</p>
+          <div style={{ marginBottom: '1.5em' }}>
+            <p style={{ marginBottom: '0.5em' }}>← ↑ → ↓ : MOVER</p>
+            <p style={{ marginBottom: '0.5em' }}>ESPACIO : DISPARAR</p>
+            <p style={{ marginBottom: '0.5em' }}>ESC : PAUSA</p>
           </div>
 
           <div style={{ 
             borderTop: '2px solid white', 
-            paddingTop: '20px',
-            marginBottom: '25px'
+            paddingTop: '1em',
+            marginBottom: '1.5em',
+            width: '100%'
           }}>
             <h5 style={{ 
-              fontSize: '18px', 
-              marginBottom: '15px',
+              marginBottom: '1em',
               color: '#00ff00'
             }}>
               MODO 2 JUGADORES
             </h5>
-            <p style={{ marginBottom: '8px', fontSize: '14px' }}>Los jugadores se turnan cuando uno pierde todas sus vidas</p>
-            <p style={{ marginBottom: '8px', fontSize: '14px' }}>El juego termina cuando ambos jugadores se quedan sin vidas</p>
-            <p style={{ marginBottom: '8px', fontSize: '14px' }}>Se guarda el puntaje combinado de la pareja</p>
+            <p style={{ marginBottom: '0.5em' }}>Los jugadores se turnan cuando uno pierde todas sus vidas</p>
+            <p style={{ marginBottom: '0.5em' }}>El juego termina cuando ambos jugadores se quedan sin vidas</p>
+            <p style={{ marginBottom: '0.5em' }}>Se guarda el puntaje combinado de la pareja</p>
           </div>
           
           <div style={{ 
             borderTop: '2px solid white', 
-            paddingTop: '20px',
-            marginBottom: '25px'
+            paddingTop: '1em',
+            marginBottom: '1.5em',
+            width: '100%'
           }}>
             <h5 style={{ 
-              fontSize: '20px', 
-              marginBottom: '15px',
+              marginBottom: '1em',
               color: '#00ff00'
             }}>
               ENEMIGOS
             </h5>
-            <p style={{ marginBottom: '8px' }}>NORMAL: 50 PTS</p>
-            <p style={{ marginBottom: '8px' }}>VERDE: 100 PTS</p>
+            <p style={{ marginBottom: '0.5em' }}>NORMAL: 50 PTS</p>
+            <p style={{ marginBottom: '0.5em' }}>VERDE: 100 PTS</p>
           </div>
           
-          <div 
-            onClick={() => setMostrarInstrucciones(false)} 
+          <button 
+            className="interactive-button"
+            onClick={() => setMostrarInstrucciones(false)}
             style={{ 
-              cursor: 'pointer', 
-              fontSize: '20px',
-              padding: '15px 30px',
-              border: '2px solid white',
-              backgroundColor: 'transparent',
-              color: 'white',
-              minWidth: '200px',
-              textAlign: 'center',
-              margin: '0 auto'
+              marginTop: '1em'
             }}
           >
             [ VOLVER ]
-          </div>
+          </button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="nes-screen" style={{ 
-      width: ANCHO_JUEGO, 
-      height: ALTO_JUEGO, 
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '20px'
-    }}>
+    <div className="nes-screen">
       {/* HI SCORES arriba a la derecha */}
       <div style={{
         position: 'absolute',
-        top: '15px',
-        right: '15px',
+        top: '1em',
+        right: '1em',
         textAlign: 'right',
-        color: 'white',
-        fontSize: '12px'
+        fontSize: '0.75em'
       }}>
-        <div style={{ marginBottom: '10px' }}>
-          <div style={{ marginBottom: '5px' }}>1P HI SCORE</div>
+        <div style={{ marginBottom: '0.8em' }}>
+          <div style={{ marginBottom: '0.3em' }}>1P HI SCORE</div>
           <div style={{ color: '#ffff00' }}>
             {puntajeMaximo.toLocaleString().padStart(8, '0')}
           </div>
         </div>
         <div>
-          <div style={{ marginBottom: '5px' }}>2P HI SCORE</div>
+          <div style={{ marginBottom: '0.3em' }}>2P HI SCORE</div>
           <div style={{ color: '#00ff00' }}>
             {puntajeMaximoPareja.toLocaleString().padStart(8, '0')}
           </div>
@@ -150,13 +132,13 @@ function PantallaInicio() {
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1,
-        marginTop: '50px'
+        marginTop: '3em'
       }}>
         <img
           src="/assets/screens/titulo_1942.png"
           alt="1942"
           style={{
-            height: '120px',
+            height: '7.5em',
             maxWidth: '90%',
             imageRendering: 'pixelated'
           }}
@@ -167,111 +149,43 @@ function PantallaInicio() {
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px',
+        gap: '1em',
         alignItems: 'center',
         width: '100%',
-        maxWidth: '400px',
-        marginBottom: '50px'
+        maxWidth: '90%',
+        marginBottom: '2em'
       }}>
-        <div 
-          onClick={() => iniciarJuego('1P')} 
-          style={{ 
-            cursor: 'pointer',
-            fontSize: '24px',
-            padding: '15px 30px',
-            border: '2px solid white',
-            backgroundColor: 'transparent',
-            color: 'white',
-            textAlign: 'center',
-            minWidth: '280px',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = 'white'
-            e.target.style.color = 'black'
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent'
-            e.target.style.color = 'white'
-          }}
+        <button 
+          className="interactive-button"
+          onClick={() => iniciarJuego('1P')}
+          style={{ fontSize: '1.5em' }}
         >
           1 PLAYER
-        </div>
+        </button>
 
-        <div 
-          onClick={() => iniciarJuego('2P')} 
-          style={{ 
-            cursor: 'pointer',
-            fontSize: '24px',
-            padding: '15px 30px',
-            border: '2px solid white',
-            backgroundColor: 'transparent',
-            color: 'white',
-            textAlign: 'center',
-            minWidth: '280px',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = 'white'
-            e.target.style.color = 'black'
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent'
-            e.target.style.color = 'white'
-          }}
+        <button 
+          className="interactive-button"
+          onClick={() => iniciarJuego('2P')}
+          style={{ fontSize: '1.5em' }}
         >
           2 PLAYERS
-        </div>
+        </button>
         
-        <div 
-          onClick={() => setMostrarInstrucciones(true)} 
-          style={{ 
-            cursor: 'pointer',
-            fontSize: '20px',
-            padding: '12px 25px',
-            border: '2px solid white',
-            backgroundColor: 'transparent',
-            color: 'white',
-            textAlign: 'center',
-            minWidth: '280px',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = 'white'
-            e.target.style.color = 'black'
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent'
-            e.target.style.color = 'white'
-          }}
+        <button 
+          className="interactive-button"
+          onClick={() => setMostrarInstrucciones(true)}
+          style={{ fontSize: '1.25em' }}
         >
           INSTRUCCIONES
-        </div>
+        </button>
         
-        <div 
+        <button 
+          className="interactive-button"
           onClick={mostrarRanking}
-          style={{ 
-            cursor: 'pointer',
-            fontSize: '20px',
-            padding: '12px 25px',
-            border: '2px solid white',
-            backgroundColor: 'transparent',
-            color: 'white',
-            textAlign: 'center',
-            minWidth: '280px',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = 'white'
-            e.target.style.color = 'black'
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent'
-            e.target.style.color = 'white'
-          }}
+          style={{ fontSize: '1.25em' }}
         >
           RANKING
-        </div>
+        </button>
       </div>
     </div>
   )

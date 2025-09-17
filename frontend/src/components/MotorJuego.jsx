@@ -32,33 +32,33 @@ const MIN_SPAWN_POWERUP = 5
 const MAX_SPAWN_POWERUP = 15
 const PUNTOS_POW = 2000
 
-// Componente optimizado para mostrar vidas como avioncitos
+// Componente optimizado para mostrar vidas como avioncitos - RESPONSIVE
 const VidasDisplay = React.memo(({ vidas, vidasPerdidas, jugador }) => {
   return (
     <div className="position-absolute" style={{ 
-      bottom: jugador === 1 ? '20px' : '60px', 
-      left: '20px', 
+      bottom: jugador === 1 ? '1.25em' : '3.75em', 
+      left: '1.25em', 
       zIndex: 20 
     }}>
       <div style={{ 
         display: 'flex', 
         alignItems: 'center',
-        gap: '8px',
-        fontSize: '14px',
+        gap: '0.5em',
+        fontSize: '0.875em',
         color: jugador === 1 ? '#00ff00' : '#ffff00',
-        marginBottom: '5px'
+        marginBottom: '0.3em'
       }}>
         P{jugador}
       </div>
-      <div style={{ display: 'flex', gap: '5px' }}>
+      <div style={{ display: 'flex', gap: '0.3em' }}>
         {[...Array(3)].map((_, i) => (
           <img
             key={i}
             src="/assets/avion_recto.png"
             alt="vida"
             style={{
-              width: '16px',
-              height: '16px',
+              width: '1em',
+              height: '1em',
               imageRendering: 'pixelated',
               opacity: i >= vidas ? 0.3 : 1,
               animation: vidasPerdidas.includes(i) ? 'parpadeo 0.5s ease-out' : 'none'
@@ -77,7 +77,7 @@ const VidasDisplay = React.memo(({ vidas, vidasPerdidas, jugador }) => {
   )
 })
 
-// Componente HUD optimizado para 2 jugadores
+// Componente HUD optimizado para 2 jugadores - RESPONSIVE
 const HUDDisplay = React.memo(({ 
   modoJuego, 
   jugadorActual, 
@@ -88,48 +88,76 @@ const HUDDisplay = React.memo(({
 }) => {
   if (modoJuego === '1P') {
     return (
-      <div className="position-absolute top-0 w-100 d-flex justify-content-between align-items-center p-2"
-        style={{ fontSize: '14px', color: 'white', zIndex: 20 }}>
-        <div>1UP</div>
-        <div style={{ marginLeft: '10px' }}>{puntuacionJ1.toLocaleString().padStart(8, '0')}</div>
-
-        <div style={{ textAlign: 'center', flex: 1 }}>
-          <div>HIGH SCORE</div>
-          <div>{puntajeMaximo.toLocaleString().padStart(8, '0')}</div>
+      <div 
+        className="position-absolute top-0 w-100 d-flex justify-content-between align-items-center"
+        style={{ 
+          fontSize: '0.875em', 
+          color: 'white', 
+          zIndex: 20,
+          padding: '0.5em'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6em' }}>
+          <div>1UP</div>
+          <div>{puntuacionJ1.toLocaleString().padStart(8, '0')}</div>
         </div>
 
-        <div>2UP</div>
-        <div style={{ marginLeft: '10px' }}>00000000</div>
+        <div style={{ textAlign: 'center', flex: 1 }}>
+          <div style={{ fontSize: '0.75em' }}>HIGH SCORE</div>
+          <div style={{ fontSize: '0.875em' }}>{puntajeMaximo.toLocaleString().padStart(8, '0')}</div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6em' }}>
+          <div>2UP</div>
+          <div>00000000</div>
+        </div>
       </div>
     )
   }
 
   // Modo 2P
   return (
-    <div className="position-absolute top-0 w-100 p-2" style={{ fontSize: '12px', color: 'white', zIndex: 20 }}>
+    <div 
+      className="position-absolute top-0 w-100" 
+      style={{ 
+        fontSize: '0.75em', 
+        color: 'white', 
+        zIndex: 20,
+        padding: '0.5em'
+      }}
+    >
       {/* Primera fila */}
-      <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: '5px' }}>
-        <div style={{ color: jugadorActual === 1 ? '#00ff00' : 'white' }}>
+      <div 
+        className="d-flex justify-content-between align-items-center" 
+        style={{ marginBottom: '0.3em' }}
+      >
+        <div style={{ 
+          color: jugadorActual === 1 ? '#00ff00' : 'white',
+          fontSize: '0.8em'
+        }}>
           P1: {puntuacionJ1.toLocaleString().padStart(8, '0')}
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div>2P HIGH SCORE</div>
-          <div>{puntajeMaximoPareja.toLocaleString().padStart(8, '0')}</div>
+          <div style={{ fontSize: '0.7em' }}>2P HIGH SCORE</div>
+          <div style={{ fontSize: '0.8em' }}>{puntajeMaximoPareja.toLocaleString().padStart(8, '0')}</div>
         </div>
-        <div style={{ color: jugadorActual === 2 ? '#ffff00' : 'white' }}>
+        <div style={{ 
+          color: jugadorActual === 2 ? '#ffff00' : 'white',
+          fontSize: '0.8em'
+        }}>
           P2: {puntuacionJ2.toLocaleString().padStart(8, '0')}
         </div>
       </div>
       
       {/* Segunda fila */}
-      <div className="text-center" style={{ fontSize: '14px' }}>
+      <div className="text-center" style={{ fontSize: '0.875em' }}>
         <div style={{ 
           color: jugadorActual === 1 ? '#00ff00' : '#ffff00',
           fontWeight: 'bold'
         }}>
           PLAYER {jugadorActual} TURN
         </div>
-        <div style={{ fontSize: '10px', color: '#ccc' }}>
+        <div style={{ fontSize: '0.625em', color: '#ccc' }}>
           TOTAL: {(puntuacionJ1 + puntuacionJ2).toLocaleString()}
         </div>
       </div>
@@ -185,7 +213,7 @@ function MotorJuego() {
   const [vidasPerdidasJ1, setVidasPerdidasJ1] = useState([])
   const [vidasPerdidasJ2, setVidasPerdidasJ2] = useState([])
 
-  // Controles táctiles
+  // Controles táciles
   const [movimientoTactil, setMovimientoTactil] = useState({ x: 0, y: 0, active: false })
   const [disparoTactil, setDisparoTactil] = useState(false)
 
@@ -633,12 +661,7 @@ function MotorJuego() {
   }, [teclas, movimientoTactil, disparoTactil, jugadorActual, puntuacionJ1, puntuacionJ2, vidasJ1, vidasJ2, modoJuego, pausarJuego, finalizarJuego, setPuntuacion, setVidas, actualizarEstadoVisual, manejarPerdidaVida])
 
   return (
-    <div className="nes-screen" style={{
-      width: ANCHO_JUEGO,
-      height: ALTO_JUEGO,
-      overflow: 'hidden',
-      position: 'relative'
-    }}>
+    <div className="nes-screen">
 
       {/* HUD */}
       <HUDDisplay 
@@ -684,22 +707,39 @@ function MotorJuego() {
         />
       ))}
 
-      {/* Controles táctiles */}
+      {/* Controles táctiles - Responsive */}
       {esMobile && (
         <>
           <JoystickVirtual
             onMover={(x, y, active) => setMovimientoTactil({ x, y, active })}
-            style={{ bottom: '60px', left: '20px' }}
+            style={{ 
+              bottom: '3.75em', 
+              left: '1.25em',
+              width: '4em',
+              height: '4em'
+            }}
           />
           <BotonDisparoVirtual
             onDisparar={(active) => setDisparoTactil(active)}
-            style={{ bottom: '60px', right: '20px' }}
+            style={{ 
+              bottom: '3.75em', 
+              right: '1.25em',
+              width: '3em',
+              height: '3em'
+            }}
           />
         </>
       )}
 
+      {/* Ayuda de controles - Responsive */}
       {!esMobile && (
-        <div className="position-absolute bottom-0 end-0 p-2 text-white" style={{ fontSize: '12px' }}>
+        <div 
+          className="position-absolute bottom-0 end-0 text-white" 
+          style={{ 
+            fontSize: '0.75em',
+            padding: '0.5em'
+          }}
+        >
           ESC: Pause
         </div>
       )}

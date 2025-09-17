@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useContextoJuego } from '../contexts/ContextoJuego'
-import { ANCHO_JUEGO, ALTO_JUEGO } from '../constants/constantesJuego'
 
 function PantallaGameOver({
   onGuardarPuntaje,
@@ -33,7 +32,7 @@ function PantallaGameOver({
   const j2EsRecord = rankingJ2 && rankingJ2 > 0 && rankingJ2 <= 10
   const parejaEsRecord = rankingPareja && rankingPareja > 0 && rankingPareja <= 10
 
-  // ✅ FUNCIÓN PARA FILTRAR SOLO LETRAS
+  // Función para filtrar solo letras
   const soloLetras = (str) => str.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase()
 
   const manejarGuardarJ1 = async () => {
@@ -93,46 +92,63 @@ function PantallaGameOver({
   if (modoJuego === '1P') {
     return (
       <div className="nes-screen" style={{
-        width: ANCHO_JUEGO,
-        height: ALTO_JUEGO,
-        padding: '20px',
+        padding: '1em',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center'
       }}>
-        <div className="text-center text-white" style={{ fontSize: '24px', width: '100%' }}>
-          <h1 style={{ marginBottom: '20px', color: '#ff0000' }}>GAME OVER</h1>
-          <h2 style={{ marginBottom: '30px' }}>SCORE: {puntuacionJ1.toLocaleString().padStart(8, '0')}</h2>
+        <div style={{ 
+          textAlign: 'center',
+          fontSize: '1.5em',
+          width: '100%',
+          maxWidth: '90%'
+        }}>
+          <h1 style={{ 
+            marginBottom: '1em', 
+            color: '#ff0000',
+            fontSize: '1.6em' 
+          }}>
+            GAME OVER
+          </h1>
+          <h2 style={{ marginBottom: '1.5em' }}>
+            SCORE: {puntuacionJ1.toLocaleString().padStart(8, '0')}
+          </h2>
 
           {j1EsRecord && !puntajeGuardado && (
-            <div className="text-center" style={{ marginBottom: '30px' }}>
-              <h4 style={{ color: '#ffff00', marginBottom: '15px' }}>
+            <div style={{ marginBottom: '2em' }}>
+              <h4 style={{ 
+                color: '#ffff00', 
+                marginBottom: '1em',
+                fontSize: '1.2em'
+              }}>
                 ¡NUEVO HIGH SCORE!
               </h4>
-              <p style={{ fontSize: '16px', marginBottom: '15px' }}>
+              <p style={{ 
+                fontSize: '1em', 
+                marginBottom: '1em' 
+              }}>
                 POSICION #{rankingJ1} - INGRESA TUS INICIALES:
               </p>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '15px',
+                gap: '1em',
                 justifyContent: 'center',
                 flexWrap: 'wrap'
               }}>
                 <input
                   type="text"
                   style={{
-                    width: '120px',
-                    height: '50px',
-                    fontSize: '24px',
+                    width: '5em',
+                    height: '2.5em',
+                    fontSize: '1.2em',
                     textAlign: 'center',
                     textTransform: 'uppercase',
                     backgroundColor: 'black',
                     color: 'white',
                     border: '2px solid white',
-                    borderRadius: '0',
-                    fontFamily: '"Pixelify Sans", monospace'
+                    borderRadius: '0'
                   }}
                   maxLength={3}
                   value={inicialesJ1}
@@ -143,15 +159,13 @@ function PantallaGameOver({
                   placeholder="ABC"
                 />
                 <button
+                  className="interactive-button"
                   style={{
                     backgroundColor: inicialesJ1.length === 3 ? 'white' : '#666',
                     color: inicialesJ1.length === 3 ? 'black' : '#ccc',
-                    border: 'none',
-                    padding: '10px 20px',
-                    fontSize: '18px',
                     cursor: inicialesJ1.length === 3 && !guardandoIndividual ? 'pointer' : 'not-allowed',
-                    fontFamily: '"Pixelify Sans", monospace',
-                    textTransform: 'uppercase'
+                    fontSize: '1em',
+                    minWidth: '8em'
                   }}
                   onClick={manejarGuardarJ1}
                   disabled={inicialesJ1.length !== 3 || guardandoIndividual}
@@ -163,46 +177,44 @@ function PantallaGameOver({
           )}
 
           {(puntajeGuardado || !j1EsRecord) && (
-            <div className="text-center">
+            <div>
               {puntajeGuardado && (
-                <div style={{ marginBottom: '20px' }}>
-                  <h5 style={{ color: '#00ff00', fontSize: '18px' }}>
+                <div style={{ marginBottom: '1.5em' }}>
+                  <h5 style={{ 
+                    color: '#00ff00', 
+                    fontSize: '1.125em' 
+                  }}>
                     ¡SCORE GUARDADO, {inicialesJ1}!
                   </h5>
                 </div>
               )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
-                <div
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '1em', 
+                alignItems: 'center' 
+              }}>
+                <button
+                  className="interactive-button"
                   onClick={() => iniciarJuego('1P')}
                   style={{
-                    cursor: 'pointer',
-                    fontSize: '20px',
-                    padding: '10px 20px',
-                    border: '2px solid white',
-                    backgroundColor: 'transparent',
-                    color: 'white',
-                    minWidth: '250px',
-                    textAlign: 'center'
+                    fontSize: '1.25em',
+                    minWidth: '12em'
                   }}
                 >
                   [ JUGAR DE NUEVO ]
-                </div>
-                <div
+                </button>
+                <button
+                  className="interactive-button"
                   onClick={volverAlMenuPrincipal}
                   style={{
-                    cursor: 'pointer',
-                    fontSize: '20px',
-                    padding: '10px 20px',
-                    border: '2px solid white',
-                    backgroundColor: 'transparent',
-                    color: 'white',
-                    minWidth: '250px',
-                    textAlign: 'center'
+                    fontSize: '1.25em',
+                    minWidth: '12em'
                   }}
                 >
                   [ MENÚ PRINCIPAL ]
-                </div>
+                </button>
               </div>
             </div>
           )}
@@ -214,47 +226,89 @@ function PantallaGameOver({
   // Modo 2P
   return (
     <div className="nes-screen" style={{
-      width: ANCHO_JUEGO,
-      height: ALTO_JUEGO,
-      padding: '15px',
+      padding: '0.8em',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center'
     }}>
-      <div className="text-center text-white" style={{ fontSize: '20px', width: '100%' }}>
-        <h1 style={{ marginBottom: '20px', color: '#ff0000' }}>GAME OVER</h1>
+      <div style={{ 
+        textAlign: 'center',
+        fontSize: '1.25em',
+        width: '100%',
+        maxWidth: '95%'
+      }}>
+        <h1 style={{ 
+          marginBottom: '1em', 
+          color: '#ff0000',
+          fontSize: '1.6em'
+        }}>
+          GAME OVER
+        </h1>
 
-        <div style={{ marginBottom: '25px', fontSize: '18px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+        <div style={{ 
+          marginBottom: '1.5em', 
+          fontSize: '1.125em' 
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            marginBottom: '0.5em',
+            flexWrap: 'wrap',
+            gap: '0.5em'
+          }}>
             <span style={{ color: '#00ff00' }}>P1: {puntuacionJ1.toLocaleString()}</span>
             <span style={{ color: '#ffff00' }}>P2: {puntuacionJ2.toLocaleString()}</span>
           </div>
-          <div style={{ fontSize: '22px', color: '#ffffff' }}>
+          <div style={{ 
+            fontSize: '1.375em', 
+            color: '#ffffff' 
+          }}>
             TOTAL: {puntuacionTotal.toLocaleString()}
           </div>
         </div>
 
         {/* Records individuales */}
         {(j1EsRecord || j2EsRecord) && !puntajeGuardado && (
-          <div style={{ marginBottom: '25px', fontSize: '14px' }}>
-            <h4 style={{ color: '#ffff00', marginBottom: '15px' }}>
+          <div style={{ 
+            marginBottom: '1.5em', 
+            fontSize: '0.875em' 
+          }}>
+            <h4 style={{ 
+              color: '#ffff00', 
+              marginBottom: '1em',
+              fontSize: '1.2em' 
+            }}>
               ¡NUEVOS RECORDS INDIVIDUALES!
             </h4>
 
-            <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div style={{ 
+              display: 'flex', 
+              gap: '1em', 
+              justifyContent: 'center', 
+              flexWrap: 'wrap' 
+            }}>
               {j1EsRecord && (
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ marginBottom: '10px', color: '#00ff00' }}>
-                    P1 - POSICION #{rankingJ1}
+                <div style={{ textAlign: 'center', minWidth: '8em' }}>
+                  <p style={{ 
+                    marginBottom: '0.5em', 
+                    color: '#00ff00',
+                    fontSize: '0.9em'
+                  }}>
+                    P1 - POS #{rankingJ1}
                   </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '0.5em', 
+                    alignItems: 'center' 
+                  }}>
                     <input
                       type="text"
                       style={{
-                        width: '80px',
-                        height: '35px',
-                        fontSize: '16px',
+                        width: '4em',
+                        height: '2em',
+                        fontSize: '1em',
                         textAlign: 'center',
                         textTransform: 'uppercase',
                         backgroundColor: 'black',
@@ -269,12 +323,13 @@ function PantallaGameOver({
                       disabled={guardandoIndividual}
                     />
                     <button
+                      className="interactive-button"
                       style={{
                         backgroundColor: inicialesJ1.length === 3 ? '#00ff00' : '#666',
                         color: inicialesJ1.length === 3 ? 'black' : '#ccc',
-                        border: 'none',
-                        padding: '5px 15px',
-                        fontSize: '12px',
+                        fontSize: '0.7em',
+                        padding: '0.3em 0.8em',
+                        minWidth: '4em',
                         cursor: inicialesJ1.length === 3 && !guardandoIndividual ? 'pointer' : 'not-allowed'
                       }}
                       onClick={manejarGuardarJ1}
@@ -287,17 +342,26 @@ function PantallaGameOver({
               )}
 
               {j2EsRecord && (
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ marginBottom: '10px', color: '#ffff00' }}>
-                    P2 - POSICION #{rankingJ2}
+                <div style={{ textAlign: 'center', minWidth: '8em' }}>
+                  <p style={{ 
+                    marginBottom: '0.5em', 
+                    color: '#ffff00',
+                    fontSize: '0.9em'
+                  }}>
+                    P2 - POS #{rankingJ2}
                   </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '0.5em', 
+                    alignItems: 'center' 
+                  }}>
                     <input
                       type="text"
                       style={{
-                        width: '80px',
-                        height: '35px',
-                        fontSize: '16px',
+                        width: '4em',
+                        height: '2em',
+                        fontSize: '1em',
                         textAlign: 'center',
                         textTransform: 'uppercase',
                         backgroundColor: 'black',
@@ -312,12 +376,13 @@ function PantallaGameOver({
                       disabled={guardandoIndividual}
                     />
                     <button
+                      className="interactive-button"
                       style={{
                         backgroundColor: inicialesJ2.length === 3 ? '#ffff00' : '#666',
                         color: inicialesJ2.length === 3 ? 'black' : '#ccc',
-                        border: 'none',
-                        padding: '5px 15px',
-                        fontSize: '12px',
+                        fontSize: '0.7em',
+                        padding: '0.3em 0.8em',
+                        minWidth: '4em',
                         cursor: inicialesJ2.length === 3 && !guardandoIndividual ? 'pointer' : 'not-allowed'
                       }}
                       onClick={manejarGuardarJ2}
@@ -334,21 +399,34 @@ function PantallaGameOver({
 
         {/* Record de pareja */}
         {parejaEsRecord && !puntajeGuardado && (
-          <div style={{ marginBottom: '25px', fontSize: '14px' }}>
-            <h4 style={{ color: '#ff00ff', marginBottom: '15px' }}>
+          <div style={{ 
+            marginBottom: '1.5em', 
+            fontSize: '0.875em' 
+          }}>
+            <h4 style={{ 
+              color: '#ff00ff', 
+              marginBottom: '1em',
+              fontSize: '1.2em'
+            }}>
               ¡NUEVO RECORD DE PAREJA!
             </h4>
-            <p style={{ marginBottom: '15px' }}>
+            <p style={{ marginBottom: '1em' }}>
               POSICION #{rankingPareja} - INGRESA LOS NOMBRES:
             </p>
 
-            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ 
+              display: 'flex', 
+              gap: '0.8em', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              flexWrap: 'wrap' 
+            }}>
               <input
                 type="text"
                 style={{
-                  width: '80px',
-                  height: '35px',
-                  fontSize: '16px',
+                  width: '4em',
+                  height: '2em',
+                  fontSize: '1em',
                   textAlign: 'center',
                   textTransform: 'uppercase',
                   backgroundColor: 'black',
@@ -362,13 +440,13 @@ function PantallaGameOver({
                 placeholder="ABC"
                 disabled={guardandoPareja}
               />
-              <span style={{ color: '#fff' }}>&</span>
+              <span style={{ color: '#fff', fontSize: '1.2em' }}>&</span>
               <input
                 type="text"
                 style={{
-                  width: '80px',
-                  height: '35px',
-                  fontSize: '16px',
+                  width: '4em',
+                  height: '2em',
+                  fontSize: '1em',
                   textAlign: 'center',
                   textTransform: 'uppercase',
                   backgroundColor: 'black',
@@ -383,12 +461,13 @@ function PantallaGameOver({
                 disabled={guardandoPareja}
               />
               <button
+                className="interactive-button"
                 style={{
                   backgroundColor: inicialesJ1.length === 3 && inicialesJ2.length === 3 ? '#ff00ff' : '#666',
                   color: inicialesJ1.length === 3 && inicialesJ2.length === 3 ? 'black' : '#ccc',
-                  border: 'none',
-                  padding: '5px 15px',
-                  fontSize: '12px',
+                  fontSize: '0.7em',
+                  padding: '0.3em 0.8em',
+                  minWidth: '6em',
                   cursor: inicialesJ1.length === 3 && inicialesJ2.length === 3 && !guardandoPareja ? 'pointer' : 'not-allowed'
                 }}
                 onClick={manejarGuardarPareja}
@@ -402,49 +481,44 @@ function PantallaGameOver({
 
         {/* Botones de navegación */}
         {(puntajeGuardado || (!j1EsRecord && !j2EsRecord && !parejaEsRecord)) && (
-          <div className="text-center">
+          <div>
             {puntajeGuardado && (
-              <div style={{ marginBottom: '20px' }}>
-                <h5 style={{ color: '#00ff00', fontSize: '16px' }}>
+              <div style={{ marginBottom: '1em' }}>
+                <h5 style={{ 
+                  color: '#00ff00', 
+                  fontSize: '1em' 
+                }}>
                   ¡SCORES GUARDADOS!
                 </h5>
               </div>
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
-              <div
-                onClick={() => {
-                  // reset explícito de todo
-                  iniciarJuego('2P')
-                }}
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '1em', 
+              alignItems: 'center' 
+            }}>
+              <button
+                className="interactive-button"
+                onClick={() => iniciarJuego('2P')}
                 style={{
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  padding: '10px 20px',
-                  border: '2px solid white',
-                  backgroundColor: 'transparent',
-                  color: 'white',
-                  minWidth: '250px',
-                  textAlign: 'center'
+                  fontSize: '1.125em',
+                  minWidth: '12em'
                 }}
               >
                 [ JUGAR DE NUEVO ]
-              </div>
-              <div
+              </button>
+              <button
+                className="interactive-button"
                 onClick={volverAlMenuPrincipal}
                 style={{
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  padding: '10px 20px',
-                  border: '2px solid white',
-                  backgroundColor: 'transparent',
-                  color: 'white',
-                  minWidth: '250px',
-                  textAlign: 'center'
+                  fontSize: '1.125em',
+                  minWidth: '12em'
                 }}
               >
                 [ MENÚ PRINCIPAL ]
-              </div>
+              </button>
             </div>
           </div>
         )}

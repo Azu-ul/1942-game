@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useContextoJuego } from '../contexts/ContextoJuego'
-import { ANCHO_JUEGO, ALTO_JUEGO } from '../constants/constantesJuego'
 
 function PantallaRanking() {
   const {
@@ -15,9 +14,7 @@ function PantallaRanking() {
 
   return (
     <div className="nes-screen" style={{
-      width: ANCHO_JUEGO,
-      height: ALTO_JUEGO,
-      padding: '20px',
+      padding: '1em',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between'
@@ -27,63 +24,69 @@ function PantallaRanking() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: '20px',
-          marginBottom: '20px'
+          gap: '1em',
+          marginBottom: '1em'
         }}>
-          <div
+          <button
+            className="interactive-button"
             onClick={() => setMostrarParejas(false)}
             style={{
-              cursor: 'pointer',
-              fontSize: '18px',
-              padding: '8px 20px',
-              border: '2px solid white',
+              fontSize: '1.125em',
               backgroundColor: !mostrarParejas ? 'white' : 'transparent',
               color: !mostrarParejas ? 'black' : 'white',
-              textAlign: 'center',
-              minWidth: '120px'
+              minWidth: '8em'
             }}
           >
             1 PLAYER
-          </div>
-          <div
+          </button>
+          <button
+            className="interactive-button"
             onClick={() => setMostrarParejas(true)}
             style={{
-              cursor: 'pointer',
-              fontSize: '18px',
-              padding: '8px 20px',
-              border: '2px solid white',
+              fontSize: '1.125em',
               backgroundColor: mostrarParejas ? 'white' : 'transparent',
               color: mostrarParejas ? 'black' : 'white',
-              textAlign: 'center',
-              minWidth: '120px'
+              minWidth: '8em'
             }}
           >
             2 PLAYERS
-          </div>
+          </button>
         </div>
 
-        <h1 className="text-center text-white" style={{
-          marginBottom: '25px',
-          fontSize: '24px',
+        <h1 style={{
+          textAlign: 'center',
+          marginBottom: '1.5em',
+          fontSize: '1.5em',
           color: mostrarParejas ? '#ff00ff' : '#ffff00'
         }}>
           {mostrarParejas ? 'COUPLES HIGH SCORES' : 'HIGH SCORES'}
         </h1>
 
         {cargandoPuntajes ? (
-          <div className="text-center text-white" style={{ fontSize: '18px' }}>
+          <div style={{ 
+            textAlign: 'center',
+            fontSize: '1.125em',
+            padding: '2em'
+          }}>
             <p>CARGANDO RANKINGS...</p>
           </div>
         ) : errorPuntajes ? (
-          <div className="text-center" style={{ color: '#ff0000', fontSize: '18px' }}>
+          <div style={{ 
+            textAlign: 'center', 
+            color: '#ff0000', 
+            fontSize: '1.125em',
+            padding: '2em'
+          }}>
             <p>ERROR AL CARGAR RANKINGS</p>
           </div>
         ) : (
           <div style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px',
-            minHeight: '400px'
+            gap: '0.5em',
+            minHeight: '20em',
+            maxHeight: '25em',
+            overflowY: 'auto'
           }}>
             {!mostrarParejas ? (
               // Rankings individuales
@@ -95,15 +98,15 @@ function PantallaRanking() {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      padding: '10px 15px',
+                      padding: '0.5em 0.8em',
                       borderBottom: '2px solid white',
                       color: '#ffff00',
-                      fontSize: '16px',
+                      fontSize: '1em',
                       fontWeight: 'bold'
                     }}>
-                      <span style={{ minWidth: '40px' }}>POS</span>
-                      <span style={{ minWidth: '60px' }}>NAME</span>
-                      <span style={{ minWidth: '120px', textAlign: 'right' }}>SCORE</span>
+                      <span style={{ minWidth: '2.5em' }}>POS</span>
+                      <span style={{ minWidth: '4em' }}>NAME</span>
+                      <span style={{ minWidth: '7em', textAlign: 'right' }}>SCORE</span>
                     </div>
 
                     {/* Lista de scores individuales */}
@@ -114,28 +117,28 @@ function PantallaRanking() {
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          padding: '2px 5px',
+                          padding: '0.2em 0.3em',
                           backgroundColor: index % 2 === 0 ? 'rgba(255,255,255,0.1)' : 'transparent',
                           color: 'white',
-                          fontSize: '15px',
+                          fontSize: '0.9em',
                           border: '1px solid rgba(255,255,255,0.2)'
                         }}
                       >
                         <span style={{
-                          minWidth: '40px',
+                          minWidth: '2.5em',
                           color: index < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][index] : 'white'
                         }}>
                           #{(index + 1).toString().padStart(2, '0')}
                         </span>
                         <span style={{
-                          minWidth: '60px',
+                          minWidth: '4em',
                           textAlign: 'center',
                           color: index < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][index] : '#00ff00'
                         }}>
                           {puntaje.initials}
                         </span>
                         <span style={{
-                          minWidth: '100px',
+                          minWidth: '7em',
                           textAlign: 'right',
                           fontFamily: 'monospace',
                           fontWeight: 'bold',
@@ -147,13 +150,14 @@ function PantallaRanking() {
                     ))}
                   </>
                 ) : (
-                  <div className="text-center" style={{
+                  <div style={{
+                    textAlign: 'center',
                     color: '#888',
-                    fontSize: '18px',
-                    padding: '50px 20px'
+                    fontSize: '1.125em',
+                    padding: '3em 1em'
                   }}>
                     <p>NO HAY SCORES INDIVIDUALES AÚN</p>
-                    <p style={{ fontSize: '14px', marginTop: '20px' }}>
+                    <p style={{ fontSize: '0.875em', marginTop: '1em' }}>
                       ¡SÉ EL PRIMERO EN APARECER AQUÍ!
                     </p>
                   </div>
@@ -169,15 +173,15 @@ function PantallaRanking() {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      padding: '10px 15px',
+                      padding: '0.5em 0.8em',
                       borderBottom: '2px solid white',
                       color: '#ff00ff',
-                      fontSize: '14px',
+                      fontSize: '0.875em',
                       fontWeight: 'bold'
                     }}>
-                      <span style={{ minWidth: '30px' }}>POS</span>
-                      <span style={{ minWidth: '100px' }}>COUPLE</span>
-                      <span style={{ minWidth: '100px', textAlign: 'right' }}>TOTAL</span>
+                      <span style={{ minWidth: '2em' }}>POS</span>
+                      <span style={{ minWidth: '6em' }}>COUPLE</span>
+                      <span style={{ minWidth: '6em', textAlign: 'right' }}>TOTAL</span>
                     </div>
 
                     {/* Lista de scores de parejas */}
@@ -188,28 +192,29 @@ function PantallaRanking() {
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          padding: '2px 5px',
+                          padding: '0.2em 0.3em',
                           backgroundColor: index % 2 === 0 ? 'rgba(255,255,255,0.1)' : 'transparent',
                           color: 'white',
-                          fontSize: '15px',
+                          fontSize: '0.9em',
                           border: '1px solid rgba(255,255,255,0.2)'
                         }}
                       >
                         <span style={{
-                          minWidth: '30px',
+                          minWidth: '2em',
                           color: index < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][index] : 'white'
                         }}>
                           #{(index + 1).toString().padStart(2, '0')}
                         </span>
                         <span style={{
-                          minWidth: '100px',
+                          minWidth: '6em',
                           textAlign: 'center',
-                          color: index < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][index] : '#00ff00'
+                          color: index < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][index] : '#00ff00',
+                          fontSize: '0.8em'
                         }}>
                           {pareja.player1_initials} & {pareja.player2_initials}
                         </span>
                         <span style={{
-                          minWidth: '100px',
+                          minWidth: '6em',
                           textAlign: 'right',
                           fontFamily: 'monospace',
                           fontWeight: 'bold',
@@ -221,13 +226,14 @@ function PantallaRanking() {
                     ))}
                   </>
                 ) : (
-                  <div className="text-center" style={{
+                  <div style={{
+                    textAlign: 'center',
                     color: '#888',
-                    fontSize: '18px',
-                    padding: '50px 20px'
+                    fontSize: '1.125em',
+                    padding: '3em 1em'
                   }}>
                     <p>NO HAY SCORES DE PAREJAS AÚN</p>
-                    <p style={{ fontSize: '14px', marginTop: '20px' }}>
+                    <p style={{ fontSize: '0.875em', marginTop: '1em' }}>
                       ¡JUEGA EN MODO 2 JUGADORES Y APARECE AQUÍ!
                     </p>
                   </div>
@@ -239,14 +245,13 @@ function PantallaRanking() {
       </div>
 
       {/* Botón para volver al menú principal */}
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+      <div style={{ textAlign: 'center', marginTop: '1em' }}>
         <button
+          className="interactive-button"
           onClick={volverAlMenuPrincipal}
-          className="nes-btn is-primary"
           style={{
-            fontSize: '16px',
-            padding: '10px 30px',
-            cursor: 'pointer'
+            fontSize: '1em',
+            padding: '0.6em 1.8em'
           }}
         >
           Volver al Menú

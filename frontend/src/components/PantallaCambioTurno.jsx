@@ -1,6 +1,5 @@
 import React from 'react'
 import { useContextoJuego } from '../contexts/ContextoJuego'
-import { ANCHO_JUEGO, ALTO_JUEGO } from '../constants/constantesJuego'
 
 function PantallaCambioTurno() {
   const { 
@@ -17,12 +16,6 @@ function PantallaCambioTurno() {
     <div 
       className="nes-screen" 
       style={{ 
-        width: ANCHO_JUEGO, 
-        height: ALTO_JUEGO, 
-        display: 'flex', 
-        flexDirection: 'column', 
-        justifyContent: 'center', 
-        alignItems: 'center',
         background: 'linear-gradient(45deg, #000, #222, #000)',
         position: 'relative'
       }}
@@ -44,17 +37,18 @@ function PantallaCambioTurno() {
         style={{
           textAlign: 'center',
           zIndex: 10,
-          padding: '40px',
+          padding: '2.5em',
           border: '3px solid #ffff00',
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
           borderRadius: '0',
-          minWidth: '400px'
+          minWidth: '80%',
+          maxWidth: '90%'
         }}
       >
         <h2 
           style={{ 
-            marginBottom: '30px',
-            fontSize: '36px',
+            marginBottom: '1.5em',
+            fontSize: '2.25em',
             color: '#ff0000',
             textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
           }}
@@ -62,16 +56,20 @@ function PantallaCambioTurno() {
           PLAYER {jugadorAnterior} DOWN!
         </h2>
         
-        <div style={{ marginBottom: '30px', fontSize: '18px', color: 'white' }}>
-          <p style={{ marginBottom: '15px' }}>
+        <div style={{ 
+          marginBottom: '1.5em', 
+          fontSize: '1.125em',
+          color: 'white' 
+        }}>
+          <p style={{ marginBottom: '0.8em' }}>
             PLAYER {jugadorAnterior} SCORE: {jugadorAnterior === 1 ? puntuacionJ1.toLocaleString() : puntuacionJ2.toLocaleString()}
           </p>
         </div>
 
         <h3 
           style={{ 
-            marginBottom: '20px',
-            fontSize: '28px',
+            marginBottom: '1em',
+            fontSize: '1.75em',
             color: '#00ff00',
             animation: 'parpadeo 0.8s ease-in-out infinite alternate'
           }}
@@ -79,19 +77,22 @@ function PantallaCambioTurno() {
           PLAYER {jugadorActual} TURN!
         </h3>
 
-        <div style={{ fontSize: '16px', color: '#cccccc' }}>
-          <p style={{ marginBottom: '10px' }}>
+        <div style={{ 
+          fontSize: '1em', 
+          color: '#cccccc' 
+        }}>
+          <p style={{ marginBottom: '0.5em' }}>
             LIVES: {jugadorActual === 1 ? vidasJ1 : vidasJ2}
           </p>
-          <p style={{ marginBottom: '20px' }}>
+          <p style={{ marginBottom: '1em' }}>
             CURRENT SCORE: {jugadorActual === 1 ? puntuacionJ1.toLocaleString() : puntuacionJ2.toLocaleString()}
           </p>
         </div>
 
         <div style={{ 
-          fontSize: '14px', 
+          fontSize: '0.875em', 
           color: '#888',
-          marginTop: '20px'
+          marginTop: '1em'
         }}>
           Get ready...
         </div>

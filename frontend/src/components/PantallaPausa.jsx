@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { useContextoJuego } from '../contexts/ContextoJuego'
-import { ANCHO_JUEGO, ALTO_JUEGO } from '../constants/constantesJuego'
 
 function PantallaPausa() {
   const { reanudarJuego, volverAlMenuPrincipal, puntuacion, vidas } = useContextoJuego()
@@ -19,35 +18,32 @@ function PantallaPausa() {
 
   return (
     <div className="nes-screen" style={{ 
-      width: ANCHO_JUEGO, 
-      height: ALTO_JUEGO, 
-      display: 'flex', 
-      flexDirection: 'column', 
-      justifyContent: 'center', 
-      alignItems: 'center',
       background: 'rgba(0, 0, 0, 0.8)'
     }}>
       <div style={{
         textAlign: 'center',
-        padding: '40px',
+        padding: '2.5em',
         border: '3px solid white',
         backgroundColor: 'rgba(0, 0, 0, 0.9)',
         borderRadius: '0',
-        minWidth: '300px'
+        minWidth: '80%',
+        maxWidth: '90%'
       }}>
-        <h2 className="text-white" style={{ 
-          marginBottom: '30px',
-          fontSize: '32px',
+        <h2 style={{ 
+          marginBottom: '1.5em',
           color: '#ffff00'
         }}>
           PAUSA
         </h2>
         
-        <div style={{ marginBottom: '30px', fontSize: '18px' }}>
-          <p className="text-white" style={{ marginBottom: '10px' }}>
+        <div style={{ 
+          marginBottom: '1.5em',
+          fontSize: '1.125em'
+        }}>
+          <p style={{ marginBottom: '0.5em' }}>
             SCORE: {puntuacion.toLocaleString().padStart(8, '0')}
           </p>
-          <p className="text-white" style={{ marginBottom: '10px' }}>
+          <p style={{ marginBottom: '0.5em' }}>
             LIVES: {vidas}
           </p>
         </div>
@@ -55,63 +51,35 @@ function PantallaPausa() {
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column', 
-          gap: '15px', 
+          gap: '1em', 
           alignItems: 'center' 
         }}>
-          <div 
-            onClick={reanudarJuego} 
+          <button 
+            className="interactive-button"
+            onClick={reanudarJuego}
             style={{ 
-              cursor: 'pointer', 
-              fontSize: '20px',
-              padding: '12px 30px',
-              border: '2px solid white',
-              backgroundColor: 'transparent',
-              color: 'white',
-              minWidth: '250px',
-              textAlign: 'center',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = 'white'
-              e.target.style.color = 'black'
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent'
-              e.target.style.color = 'white'
+              fontSize: '1.25em',
+              minWidth: '15em'
             }}
           >
             [ CONTINUAR ]
-          </div>
+          </button>
           
-          <div 
-            onClick={volverAlMenuPrincipal} 
+          <button 
+            className="interactive-button"
+            onClick={volverAlMenuPrincipal}
             style={{ 
-              cursor: 'pointer', 
-              fontSize: '18px',
-              padding: '10px 25px',
-              border: '2px solid white',
-              backgroundColor: 'transparent',
-              color: 'white',
-              minWidth: '250px',
-              textAlign: 'center',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = 'white'
-              e.target.style.color = 'black'
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent'
-              e.target.style.color = 'white'
+              fontSize: '1.125em',
+              minWidth: '15em'
             }}
           >
             [ SALIR AL MENÚ ]
-          </div>
+          </button>
         </div>
 
         <div style={{ 
-          marginTop: '20px', 
-          fontSize: '12px', 
+          marginTop: '1.25em', 
+          fontSize: '0.75em', 
           color: '#888' 
         }}>
           Presiona ESC para continuar
