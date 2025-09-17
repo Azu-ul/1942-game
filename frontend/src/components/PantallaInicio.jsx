@@ -160,7 +160,7 @@ function PantallaInicio() {
           onClick={() => iniciarJuego('1P')}
           style={{ fontSize: '1.5em' }}
         >
-          1 PLAYER
+          1 JUGADOR
         </button>
 
         <button 
@@ -168,7 +168,7 @@ function PantallaInicio() {
           onClick={() => iniciarJuego('2P')}
           style={{ fontSize: '1.5em' }}
         >
-          2 PLAYERS
+          2 JUGADORES
         </button>
         
         <button 

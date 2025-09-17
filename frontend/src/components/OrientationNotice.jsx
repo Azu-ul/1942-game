@@ -24,9 +24,9 @@ function OrientationNotice() {
 
   return (
     <div className="orientation-notice">
-      <h2>🔄 ROTATE DEVICE</h2>
-      <p>This game is optimized for landscape mode.</p>
-      <p>Please rotate your device to continue playing.</p>
+      <h2>🔄 Voltea el Dispositivo</h2>
+      <p>Este juego está desarrollado para ser jugado de forma horizontal.</p>
+      <p>Por favor, rote su dispositivo para seguir jugando.</p>
       <div style={{ 
         fontSize: '3em', 
         margin: '20px 0',
